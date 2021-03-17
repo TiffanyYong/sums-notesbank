@@ -1,0 +1,2550 @@
+\documentclass[11pt]{scrartcl}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{xcolor} 
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\newcommand{\R}[0]{\mathbb{R}}
+\addtokomafont{section}{\rmfamily\centering\scshape}
+\usepackage{float} 
+% math environments 
+\usepackage[utf8]{inputenc}
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}{Definition}
+\newtheorem{prop}{Proposition}
+\newtheorem{ex}{Example}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+% definition
+\newcommand{\dfn}[1]{\textbf{\underline{#1}}}
+\newcommand{\dist}[0]{\mathcal{F}}
+\newcommand{\pr}[1]{\mathbb{P}\left[#1 \right]} 
+\newcommand{\stat}[0]{T(X_1, ..., X_n )} 
+
+% converge in probability 
+\newcommand{\cvp}[0]{\overset{p}{\to}}
+
+% sample mean
+\newcommand{\smean}[0]{\frac{1}{n} \sum_{i=1}^n x_i} 
+
+% sample variance
+\newcommand{\svar}[0]{\frac{1}{(n-1)} \sum_{i=1}^n (x_i - \overline{x})^2}
+
+% expected value 
+\newcommand{\EX}[1]{\mathbb{E}\left[#1 \right]}  
+\newcommand{\EXth}[1]{\mathbb{E}_\theta \left[ #1 \right]}
+\newcommand{\prth}[1]{\mathbb{P}_\theta \left[#1 \right]} 
+
+
+% integral
+\newcommand{\idx}[2]{\int_{#1}^{#2}}
+
+% L2 space
+\newcommand{\Ltwo}[0]{\mathcal{L}_2}
+
+
+\title{\textbf{Math 375: Statistics} \vspace{-2ex}}
+\author{Winter 2020 Lecture Notes \vspace{-2ex}}
+\date{Shereen Elaidi}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+
+
+\pagestyle{fancy}
+\lhead{Math 357: Statistics}
+\chead{Winter 2020}
+\rhead{Page \thepage}
+\lfoot{}
+\cfoot{}
+\rfoot{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\setlength{\tabcolsep}{0.5em} % for the horizontal padding
+{\renewcommand{\arraystretch}{1.2}% for the vertical padding
+
+\section{Introduction}
+Data consists of observations $x_1, ..., x_n$. These are regarded as realisations of random phenomena modelled by the random variables $X_1, ... , X_n$. In this course, the $X_i$'s will be random variables in $\R^d$, usually with $d=1$. 
+
+\begin{definition}[Random Sample]
+	The random variables $X_1, ..., X_n$ are called a \dfn{random sample} from a distribution $F$ for $i=1,...,n$ (or, if we want, we write $X \sim F$). 
+\end{definition}
+
+In this course, the data will be a realisation of the random sample $F$. The basic issue is that $F$ is unknown, so our task is to learn $\dist$ from the realisations $x_1, ..., x_n$. A \dfn{model} for $F$ is $\dist$, which is a collection of (certain) probability distributions such that $F \in \dist$. It is always an (artificial)  \dfn{approximation to reality}. 
+
+\begin{ex}[U.S. 2016 Election Poll]. $n=2,000$, and let $x_1, ..., x_n$ be the realisations of $X_1, ..., X_n$, which are iid. Then, assuming there are only two candidates: 
+\begin{align*}
+	F \in \dist = \{\ \text{Bernoulli}(p)\ |\ p \in ]0,1[\ \} 	
+\end{align*}
+	This is an example of a \dfn{parametric model}, since $p$, which is the probability of success, is an \emph{unknown} parameter. We know that for each $x_i$, we have $x_i \in \{ 0, 1 \}$. To estimate $p$, we have:
+	\begin{align*}
+		\hat{p} = \frac{1}{n}	\sum_{i=1}^n x_i 
+	\end{align*}
+	i.e., the sample mean. By the Weak Law of Large Numbers, which we can use thanks to the iid assumption, we can see how good the estimator is by observing that it will $\hat{p}$ will converge in probability to $p$ as $n \rightarrow \infty$: 
+	\begin{align}
+		\hat{p} = \frac{1}{n} \sum_{i=1}^{n} x_i \cvp p 
+	\end{align}
+\end{ex}
+
+\section{ Properties of Random Samples}
+
+We first remark that the assumption that the $X_1, ..., X_N$ are iid is also called \textbf{sampling from an infinite population.} To see why, consider that our population were finite, say $\{ x_1, ..., x_N \}$, and we sample the $X_1,..., X_N$ with replacement. Then, the probability of choosing a specific $x_k$ would be: 
+\begin{align*}
+		& \pr{ X_1 = x_k } = \frac{1}{N}\ \forall\ k\ \in \{ 1, ..., N \} \\
+		& \pr{ X_2 = x_k\ |\ X_1 = x_j } = \begin{cases}
+			0 & \text{ if } k = j \\
+			\frac{1}{N-1} & \text{ if } k \neq j 
+		\end{cases} 
+\end{align*}
+Using the law of total probability, we can obtain $\pr{X_2 = x_k}$: 
+\begin{align*}
+	\pr{X_2 = x_k } & = \sum_{j=1}^N \pr{x_2 = x_k\ |\ X_1 = x_j } \pr{X_1 = x_j} \\
+		& = \sum_{j=1, j \neq k}^N \frac{1}{N-1	} \frac{1}{N} = \frac{1}{N}
+\end{align*}
+These samples are identically distributed but not independent. When $N >> n $, the dependence between $X_1, ..., X_n$ plays \emph{essentially no role}. The following example illustrates this: 
+
+\begin{ex} 
+Let $N=2,000$ and $n=10$. If we assume that they are not independent: 
+\begin{align*}
+\pr{X_1 > 2,000 , ... , X_n > 2,000}  =	\frac{\binom{800}{10} \binom{200}{0}}{\binom{1000}{0}} \approx 0.106164 
+\end{align*}
+If do assume they are independent: 
+\begin{align*}
+\pr{X_1 > 2,000 , ... , X_n > 2,000} = [\pr{X_1 > 200}]^{10} =  \left( \frac{800}{1000} \right)^{10} \approx 0.107374 	
+\end{align*}
+\end{ex}
+
+\begin{definition}[Statistic]
+	Let $X_1, ..., X_n$ be a random sample from $F$, a distribution on $\R^d$. For a measurable function: 
+	\begin{align}
+		T: \underbrace{\R^d \times \cdots \times \R^d}_{\text{ $n$ times } } \rightarrow R^k 
+	\end{align}
+	the random variable $T(X_1, ..., X_n)$ is called a \dfn{statistic}. The distribution of the statistic, $T(X_1,...,X_n)$ is called a \dfn{sampling distribution} of the statistic $\stat$. 
+\end{definition}
+\textbf{CAUTION}: $\stat$ is a function of $X_1, ..., X_n$ ONLY. That is, $\stat$ must be a \emph{vector of numbers.} 
+
+\begin{ex} Let's go back to the opinion poll example. The estimator 
+\begin{align*}
+\hat{p} = \frac{1}{n} \sum_{i=1}^n x_i	
+\end{align*}
+	is a statistic. A realisation is $0.47 = \stat$. Note that the following is \emph{not} a statistic: 
+	\begin{align}
+		\left( \frac{1}{n} \sum_{i=1}^n x_i - p \right)^2
+	\end{align}
+	since there is a dependence on a parameter $p$. 
+\end{ex}
+
+\begin{definition}[Sample Mean, Sample Variance, Sample Standard Deviation] The average: 
+\begin{align}
+	\overline{X} := \frac{1}{n} \sum_{i=1}^n X_i 
+\end{align}
+is called the \dfn{sample mean}. The quantity: 
+\begin{align}
+	s^2 := \svar 
+\end{align}
+is called the \dfn{sample variation}. The statistic $s := \sqrt{s^2}$ is called the \dfn{sample standard deviation.} When these values are realised, they are denoted $\overline{x}, s^2,$ and $s$. $\overline{x}$ and $s^2$ are measures of central tendency and variability, respectively. 
+
+\begin{theorem}
+	Suppose that $x_1, ..., x_n \in \R$ and let $\overline{x} := \smean$. Then: 
+	\begin{enumerate}[noitemsep]
+		\item 
+		\begin{align}
+			\min_\alpha \sum_{i=1}^n (x_i - \alpha)^2 = \sum_{i=1}^\infty (x_i - \overline{x})^2 
+		\end{align}
+		\item 
+		\begin{align}
+			(n-1)s^2 = \sum_{i=1}^n (x_i - \overline{x})^2 = \sum_{i=1}^n x_i^2 - n \overline{x} 
+		\end{align}
+	\end{enumerate}
+\end{theorem}
+\end{definition}
+
+\begin{proof}
+	\begin{enumerate}[noitemsep]
+		\item 
+			\begin{align*}
+				\sum_{i=1}^n (x_i - \alpha)^2 & = \sum_{i=1}^n (x_i \pm \overline{x} - \alpha)^2 \\
+					& = \sum_{i=1}^n (x_i - \overline{x})^2 + (\overline{x} - a)n + 2(\overline{x}-\alpha) \underbrace{\sum_{i=1}^n (x_i - \overline{x})}_{:= n\overline{x} - n \overline{x} = 0} \\
+					& \geq \sum_{i=1}^n (x_i - \overline{x})^2
+			\end{align*}	
+		\item Set $\alpha=0$ in the preceding calculation. Then: 
+		\begin{align*}
+			\sum_{i=1}^n x_i^2 = \sum_{i=1}^n (x_i - \overline{x})^2 + n\overline{x}^2	
+		\end{align*}
+	\end{enumerate}
+\end{proof}
+
+\begin{lemma}
+	Let $X_1, ..., X_n$ be iid from $F$ on $\R$, and let $g: \R \rightarrow \R$ be measurable, and $X \sim F$. Suppose that Var$[g(X)] < \infty$. Then: 
+	\begin{enumerate}[noitemsep]
+		\item 
+		\begin{align}
+			\mathbb{E} \left[ 	\sum_{i=1}^n g(X_i)		\right]  = n \mathbb{E} [ g(X) ] 
+		\end{align}
+		\item 
+		\begin{align}
+			\text{Var} \left[ 	\sum_{i=1}^n g(X_i ) 	\right] =  n \text{Var}[g(X)] 
+		\end{align}
+	\end{enumerate}
+\end{lemma}
+
+\begin{theorem}
+	Let $X_1, ..., X_n$ be a random sample from $F$, and assume that $X \sim F$. Suppose that Var$[X] = \sigma^2 < \infty$ and let $\mu := \EX{X}$. Then: 
+	\begin{enumerate}[noitemsep]
+		\item $\EX{\overline{X}} = \mu$
+		\item Var$[\overline{X}]$ = $\sigma^2 / n$. 
+		\item $\EX{s^2} = \sigma^2$. 
+	\end{enumerate}
+\end{theorem}
+\textbf{Remark.} The reason why we divided by $(n-1)$ and not $n$ in $s^2$ was because we wanted property (3) to be true. 
+
+\begin{proof}
+	\begin{enumerate}[noitemsep]
+		\item Obvious. 
+		\item 
+		\begin{align*}
+			\text{Var}[\overline{X}] = \text{Var} \left[ \frac{1}{n} \sum_{i=1}^n x_i \right] = \frac{1}{n^2} \text{Var} \left[ \sum_{i=1}^n x_i \right] = \frac{1}{n^2} n \sigma^2 = \sigma^2/n	
+		\end{align*}
+		\item 
+		\begin{align*}
+			\EX{\frac{1}{(n-1)} \sum_{i=1}^n (x_i - \overline{x}^2) } & \underbrace{=}_{\text{Thm 1.2}}  \EX{\frac{1}{(n-1)} \left[ 	\sum_{i=1}^n x_i^2 - n \overline{x} 	\right] }	 \\
+				& = \frac{1}{(n-1)} \left[ 	n \EX{X^2} - n \EX{\overline{X}}^2	\right] \\
+				& = \frac{1}{(n-1)} \left[ 		n ( \sigma^2	 + \mu^2) - n \left( 	\frac{\sigma^2}{n} - \mu^2	\right) \right]  \\
+				& = \sigma^2
+		\end{align*}
+	\end{enumerate}
+\end{proof}
+
+\begin{ex}[Simon Newcomb trying to measure the speed of light, 1835-1909] In 1882, he attempted to carry out measurements to determine the speed of light. He collected 66 data points. \emph{Question: given the data, what would be the model for the distribution of the speed of light? How would you describe the stochastic mechanism?} 
+
+We have $n$ random variables, $X_1, ..., X_n$, where $n=66$. The paramteric statistical model is: 
+\begin{align*}
+	\dist = \{\ N(\mu, \sigma^2),\ \mu \in \R^2, \sigma^2 > 0 \} 	\\
+	T_i = (24800 + X_i) \cdot 10^{-9} 
+\end{align*}
+We think that a normal distribution is reasonable. That is, $X_i \sim N(\mu, \sigma^2)$. We will write each $X_i$ as the sum of the mean and an error term, $\varepsilon$: 
+\begin{align*}
+	X_i = \mu + \varepsilon_i 	
+\end{align*}
+where we assume $\varepsilon_i \sim N(0, \sigma^2)$. The $\varepsilon_i$ has some distribution function with CDF $F_0$ with $\EX{ \varepsilon_i } = 0$. We can express the distribution $\dist$ in an alternative way in terms of shifts: 
+\begin{align*}
+\dist = \{ F_0 ( \cdot - \mu),\ \mu \in \R,\ F_0 \text{ is a CDF with expectation zero } \} 	
+\end{align*}
+This gives us something that we call a \dfn{semi-parametric model}. We then obtain the $\overline{x}$, sample mean. We can use this to estimate $\mu$. 
+
+\emph{Question: How confident are we in the obtained sample mean?} In order to answer this question, we need to know something about the sampling distribution of the statistics. We can estimate the variance of the sample mean using the previous theorem and the assumption about the errors being normally distributed as follows. Recall that the sample variance is given by: 
+\begin{align*}	
+	\svar 
+\end{align*}
+So, the expected value of $s^2$ is: 
+\begin{align*}
+	\EX{s^2} = \text{Var}[X] = \sigma^2 \text{ (if the errors are normally distributed)} 
+\end{align*}
+and, 
+\begin{align*}
+	\text{Var}[\overline{X} ] = \sigma^2 / n 	
+\end{align*}
+This means that the uncertainty of $\overline{X}$ depends on the underlying distribution since the $\sigma^2$'s are the variances of the $X_i$'s. 
+\end{ex}
+
+\begin{theorem}
+	Suppose that $X_1, ..., X_n$ is a random sample from an underlying distribution $F$. Let $X \sim F$. Suppose also that $X$ has a moment generating function $M_X(t)$ for $t \in I$. Then, the moment generating function of $\overline{X}$ is: 
+	\begin{align}
+		M_{\overline{X}} (t) = \{ M_x(t/n) \}^n,\ t/n \in I 
+	\end{align}
+\end{theorem}
+
+\begin{proof} The proof follows from the IID property of the random variables $X_1, ..., X_n$. 
+	\begin{align*}
+	\text{MGF} = \EX{e^{t\overline{X}}} & =	\EX{e^{t/n (X_1 + ... + X_n)}} \\
+						& = \EX{\prod_{i=1}^n e^{t/n X_i}} \\
+						& = \prod_{i=1}^n \EX{ e^{t/n X_i }} \\
+						& = \{ M_X(t/n) \}^n 
+	\end{align*}
+\end{proof}
+
+The next example will give us some concrete examples of applying the previous theorem. 
+
+\begin{ex}
+	\begin{enumerate}[noitemsep]
+		\item Let $F = N(\mu, \sigma^2)$. So, we know that $X \sim N(\mu, \sigma^2)$. From Math 356 we know the moment generating function is: 
+		\begin{align*}
+			M_X(t) = e^{t\mu + \frac{1}{2} \sigma^2 t^2}\ t \in \R	
+		\end{align*}
+		Invoking the theorem and simplifying:  
+		\begin{align*}
+			M_{\overline{X}} (t) & = \left(e^{\frac{t}{n}\mu + \frac{1}{2} \sigma^2 \frac{t^2}{n^2}} \right)^n\ t \in \R	\\
+			& = e^{t\mu + \frac{1}{2} \sigma^2\frac{t^2}{n}} 
+		\end{align*}
+		since the MGF uniquely determines the underlying distribution, this gives us that: 
+		\begin{align*}
+			\overline{X} \sim N(\mu, \sigma^2/n) 	
+		\end{align*}
+		\item If $X \sim $ Binomial$	(m, p)$: 
+		\begin{align*}
+			& M_X(t) = (1-p+pe^t)^m \\	
+			& M_{\overline{X}}(t) = (1 - p + pe^{t/n})^{m \cdot n} 
+		\end{align*}
+
+		\begin{enumerate}[noitemsep]
+			\item A modification of the $\overline{X}$ will be distributed binomially. Namely, $n \times \overline{X}$ will get rid of the $n$ in the denominator: 
+			\begin{align*}
+				M_{n \times \overline{X}} (t) = \EX{ e^{nt\overline{X}} } = (1-p+pe^t)^{m \cdot n } 	
+			\end{align*}
+			$ \Rightarrow $ $n \times \overline{X} \sim $ binomial$(m \cdot n, p)$. 
+		\end{enumerate}
+		\item If $X \sim $ Gamma$(\alpha, \beta)$: 
+		\begin{align*}
+			& \Gamma (\alpha) = \idx{0}{\infty} 	x ^{\alpha - 1} e^{-x} dx \\
+			& M_X(t) = (1-t\beta)^{-\alpha},\ t < \frac{1}{\beta} \\
+			& M_{\overline{X}}(t) = \left( 	1 - \frac{t}{n} \beta		\right)^{-\alpha n },\ t < \frac{n}{\beta} \\
+			& \Rightarrow \overline{X} \sim \text{Gamma}\left( \alpha \cdot n, \frac{\beta}{n} \right) 
+		\end{align*}
+	\end{enumerate}
+\end{ex}
+
+\subsection{Sampling from the Normal Population}
+
+The setup for this section will be as follows: let $X_1, ..., X_n$ be iid from $N( \mu, \sigma^2)$. 
+
+\begin{theorem}
+	Let $X_1, ..., X_n$ be iid from N$(\mu, \sigma^2)$. Then: 
+	\begin{enumerate}[noitemsep]
+		\item $\overline{X} \sim N(\mu, \sigma^2)$. (Shown using the MGF). 
+		\item $\overline{X}$ and $s^2$ are independent. 
+	\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+	WLOG for $(a)$, we can assume that $\mu=0$ and $\sigma^2 = 1$, since we standardise random variables. Why? The standardisation of a random variable $X_i$, denoted by $X_i^*$, is an affine transformation given by: 
+	\begin{align*}
+		X_i^* = \frac{X_i - \mu}{\sigma}	
+	\end{align*}
+	$X_i^*$ is still normally distributed, which can be shown using an MGF argument. Thus: 
+	\begin{align*}
+		\overline{X}_i^* = \frac{\overline{X} - \mu}{\sigma}
+	\end{align*}
+	($\overline{X} = \sigma \overline{X}^* + \mu)$. Moreover, for $(s^*)^2$:  
+	\begin{align*}
+		(s^*)^2 = \frac{1}{(n-1)	} \sum_{i=1}^n (X_i^* - \overline{X}^*)^2  = \frac{1}{(n-1)} \sum_{i=1}^n \frac{(X_i - \overline{X})^2}{\sigma^2}	= \frac{s^2}{\sigma^2}
+	\end{align*}
+	This justifies why we can say WLOG. To show that (b) holds when $\mu = 0$ and $\sigma^2 = 1$, we will play with $s^2$: 
+	\begin{align*}
+		s^2 = \frac{1}{(n-1)} \left[ \sum_{i=2}^n (X_i - \overline{X})^2 + (X_1 - \overline{X})^2  \right] 
+	\end{align*}
+	because we also know that
+	\begin{align*}
+		\sum_{i=1}^n (X_i - \overline{X}) = 0 \Rightarrow (X_1 - \overline{X}) = - \sum_{i=2}^n (X_i - \overline{X}) 	
+	\end{align*}
+	This implies that we can re-write $s^2$ as: 
+	\begin{align*}
+		s^2 = \frac{1}{(n-1)	} \left[ 	\sum_{i=2}^n (X_i - \overline{X})^2 + \left( 	\sum_{i=2}^n (X_i - \overline{X})	\right)^2 			\right] 	 := h(X_2 - \overline{X}, ..., X_n- \overline{X} )
+	\end{align*}
+	$h$ is clearly measurable. We now have a function of only $n-1$ random variables, which is why we normalise $s^2$ by $(n-1)$. 
+	
+	\begin{lemma}[Core of the argument] If $X_1, ..., X_n$ are iid $N(0,1)$, then
+	\begin{align}
+		\overline{X} \perp (X_2 - \overline{X}, ..., X_n - \overline{X}) 
+	\end{align}
+	From this lemma 1.14, we can then immediately conclude that $\overline{X} \perp s^2$. 
+	\end{lemma}
+	\begin{proof} This is where we use the normality assumption. Define a one-to-one function $g: \R^n \rightarrow \R^n$: 
+	\begin{align*}
+		g(x_1, ..., x_n ) \mapsto (\overline{x}, x_2 - \overline{x}, ..., x_n - \overline{x})	
+	\end{align*}
+	Since $g$ is one-to-one, we can invert it: 
+	\begin{align*}
+	g^{-1}(y_1, ..., y_n) \mapsto \left(g_n - \sum_{i=2}^n y_i, y_n + y_1, ..., y_n + y_1  \right) 	
+	\end{align*}
+	Need to calculate the Jacobian  of the transformation: 
+	\begin{align*}
+		\text{Jac}(g) = \begin{bmatrix}
+			1 & -1 & \cdots & -1 \\
+			1 & 1  & \cdots & 0 \\
+			\vdots & \ddots & \ddots & 0 \\
+			1 & 0 & \cdots & 1 
+		\end{bmatrix}	
+	\end{align*}
+	det$($Jac$(g)) = n$. So, by the transformation laws: 
+	\begin{align*}
+		f_{Y_1, ..., Y_n} (y_1 , ..., y_n) 	= f_{(X_1, ..., X_n} (g^{-1}(y_1, ..., y_n ) ) |\text{Jac}(g)|
+	\end{align*}
+	Here, $Y_1 = \overline{X}, Y_2= X_2 - \overline{X}, ..., Y_n  = X_n - \overline{X}$, and so by the IID of the $X_i$: 
+	\begin{align*}
+		f_{(X_1, ..., X_n)} (x_1, ..., x_n) & = \prod_{i=1}^n \frac{1}{\sqrt{2 \pi}}	 \frac{1}{\sigma} e^{\frac{-(x_i - \mu)^2}{2 \sigma^2}} \\	
+		& = \prod_{i=1}^n \frac{1}{\sqrt{ 2 \pi}} e^{-x_i^2 / 2 } 		
+	\end{align*}
+	where the second inequality follows by the standard normal assumption. 
+	\begin{align*}
+		f_{(Y_1, ..., Y_n)}	(y_1, ..., y_n) & = \left( \frac{1}{\sqrt{2 \pi}}		\right)^n \text{exp} \left\{ 	-\frac{1}{2} \left(y_1 - \sum_{i=2}^n y_i \right)^2 + \left	( y_2 + y_1\right)^2 + ... + (y_n + y_1)^2 	\right\}  \\
+			& = \left( 	\frac{1}{\sqrt{2 \pi}}	\right)^n \text{exp} \left\{ 	\frac{-n y_1^2}{2}	\right\} \prod_{i=2}^n \text{exp} \left\{ 	-\frac{1}{2} \left( \sum_{i=2}^n y_i^2 - \left( 	\sum_{i=2}^n y_i \right)^2			\right) 	\right\} 
+	\end{align*}
+	(the cross terms will drop out). Thus, we have factored the densities of the $Y$'s into the product of two functions with difference dependencies ($y_1$ vs. $y_2, ..., y_n$). 
+	Thus, $Y_1 \perp (Y_2, ..., Y_n)$ 
+	\end{proof}
+	By the following theorem from Chapter 4 of the textbook, we obtain the desired result: 
+	\begin{theorem}[Generalisation of Theorem 4.3.2]
+			Let $X_1, ..., X_N$ be independent random vectors. Let $g_i(x_i)$ be only a factor of $x_i$, $i=1,..., n$. Then, the random variables $U_i := g_i(X_i)$, $i=1,..., n$ are mutually independent. 
+	\end{theorem}
+\end{proof}
+
+\begin{definition}[Chi Squared Distribution with $v$ degrees of freedom] 
+	\begin{align}
+		f_v(x) := \frac{1}{2^{v/2} \gamma (v/2) } x^{v/2 - 1} e^{-x/2} 
+	\end{align}
+	$x > 0$. 
+\end{definition}
+
+\textbf{Remark:} $\chi^2_v$ is a Gamma$(v/2, 2)$ distribution (special case of the gamma distribution). Recall from earlier that the MGF of $\chi_v^2$ is $(1-2t)^{-v/2}$ for $t < 1/2$. 
+
+\begin{lemma}[Facts about $\chi^2$]
+	\begin{enumerate}[noitemsep]
+		\item  If $X \sim \chi_v^2$, then $\EX{X} = v$ and Var$[X] = 2v$
+		\item If $X_1 \sim \chi^2_{v_1}$ and $X_2 \sim \chi^2_{v_2}$, $X_1 \perp X_2$, then $X_1 + X_2 \sim \chi^2_{(v_1 + v_2)}$ 
+		\item If $X \sim N(0,1)$ then $X^2 \sim \chi^2_1$. (Proof of this one is on assignment 1). 
+	\end{enumerate}
+\end{lemma}
+
+The following theorem is very important since it leads to the chi squared test. 
+
+\begin{theorem}
+	Let $X_1, ..., X_n$ be a random sample from $N(\mu, \sigma^2)$. Then: 
+	\begin{align} 
+		\frac{(n-1)s^2}{\sigma^2} \sim \chi^2_{(n-1)}	
+	\end{align} 
+\end{theorem}
+
+Reality check: \begin{align*}
+ 	\EX{ \frac{(n-1)s^2}{\sigma^2}} = (n-1) 
+ \end{align*}
+ which implies that: 
+ \begin{align*}
+ 	\frac{(n-1)}{\sigma^2} \EX{s^2} = (n-1) \Rightarrow \EX{s^2} = \sigma^2	
+ \end{align*}
+
+We can elegantly prove this using moment generating functions: 
+\begin{proof}
+	From the preceding Lemma and the first theorem of the section, we have that we can standardise: 
+	\begin{align*}
+		\frac{\overline{X} - \mu}{\sigma / \sqrt{n} }	\sim N(0,1) 
+	\end{align*}
+	Squaring this, we obtain: 
+	\begin{align*}
+		n \left( 	\frac{(\overline{X} - \mu)^2}{\sigma^2}		\right) \sim \chi^2_1 	
+	\end{align*}
+	So, summing the random variables gives: 
+	\begin{align*}
+		\sum_{i=1}^n \left( 		\frac{X_i - \mu}{\sigma}	\right)^2 	\sim \chi_n^2
+	\end{align*}
+	 Therefore, by adding and subtracting the sample mean and simplifying: 
+	 \begin{align*}
+	 \sum_{i=1}^n \left( 		\frac{X_i - \mu}{\sigma}	\right)^2 &  = \frac{\sum_{i=1}^n (X_i - \overline{X})^2}{\sigma^2	} + \frac{n (\overline{X} - \mu)^2}{\sigma^2}	\\
+	 	& = \frac{(n-1)s^2}{\sigma^2	} + \underbrace{\frac{n(\overline{X} - \mu)^2}{\sigma^2}}_{ \sim \chi_1^2} 
+	 \end{align*}
+		From the first theorem of the section, these are independent. We cannot subtract to solve for the quantity that we are interested in, so we will work with moment generating functions. The MGF of the left hand side is: 
+		\begin{align*}
+			(1 - 2t)^{n/2},\ t < 1/2	
+		\end{align*}
+		and the MGF of the right hand side is: 
+		\begin{align*}
+			M_{\frac{(n-1)s^2}{\sigma^2}} (t)  \cdot (1-2t)^{-1/2},\ t < 1/2 
+		\end{align*}
+		equating these, we obtain: 
+		\begin{align*}
+			M_{\frac{(n-1)s^2}{\sigma^2}} (t) 	= (1-2t)^{-(n-1)/2},\ t < 1/2
+		\end{align*}
+		However, this is the MGF of $\chi_{(n-1)}^2$, and since the MGF uniquely determines the distribution, we obtain that $\frac{(n-1)s^2}{\sigma^2} \sim \chi^2_{(n-1)}$, which is what we wanted to show. 
+\end{proof}
+\dfn{Observe:} this proof heavily relies on the normality of the distribution, independence, and the chi squared. 
+
+\subsection{Standardisation}
+\dfn{Motivation}: quality control problem. Let $\overline{X}$ be the random variable estimating the underlying mean. Say that we set a quality cutoff, $\mu_0$, and we want to answer the question: 
+\begin{align*}
+	\text{ does } \mu = \mu_0? 	
+\end{align*}
+What if we try to standardise: 
+\begin{align*}
+	\frac{\overline{X} - \mu_0}{\sigma^/n}	 \sim N(0,1)
+\end{align*}
+and then compare the quantities? The problem here is that this is not a statistic. We do not know what $\sigma$ is. However, if you don't know something, estimate it: 
+\begin{align*}
+	\sqrt{n} \frac{\overline{X} - \mu_0}{\sqrt{s^2} }	
+\end{align*}
+The problem with this approach is that it is not distributed $N(0,1)$. Especially when the sample is not too large. This motivates the following definition: 
+
+\begin{definition}[Student-t distribution with $v$ degrees of freedom] has the density: 
+\begin{align*}
+	f_v(x) := \frac{\Gamma \left( \frac{v+1}{2} \right) }{\sqrt{ v \pi} \Gamma \left( 	\frac{v}{2}	\right) }	\left(1+ \frac{x^2}{v}	\right)^{(v+1)/2}
+\end{align*}
+	where $x \in \R$ and $v > 0$. 
+	
+\end{definition}
+
+\dfn{Remark}: if you set $v=1$, you obtain the Cauchy Lorentz distribution. $\EX{X} = \infty$. Also observe that the student-t is a heavy-tailed distribution. 
+
+\begin{lemma} Let $X \sim t_v$. Then: 
+\begin{enumerate}[noitemsep]
+	\item $\EX{X} = 0$, provided that $v> 1$ (otherwise it does not exist). 
+	\item Var$[X] = v/(v-2)$ when $v > 2$ (otherwise, var$[X]$ does not exist). 
+	\item (Assignment): if $Z \sim N(0,1)$, $V \sim \chi_v^2$, $Z \perp V$, then: 
+	\begin{align}
+		\frac{Z}{\sqrt{v/v}} \sim T_v 
+	\end{align}
+\end{enumerate}
+	This is the \textbf{most important part of the distribution}. You can prove it using the transformation theorem for densities. 
+\end{lemma}
+
+\begin{theorem}
+	Let $X_1, ..., X_n$ be a random sample from $N(\mu, \sigma^2)$. Then: 
+	\begin{align*}
+		\frac{\overline{X} - \mu}{\sqrt{ s^2/n} } \sim t_{(n-1)} 	
+	\end{align*}
+\end{theorem}
+The proof is pretty obvious using the lemma: 
+\begin{proof}
+	We will express the ratio as a standard normal $Z$. We already have that: 
+	\begin{align*}
+		\sqrt{n} \frac{\overline{X} - \mu}{\sigma} \sim N(0,1) \perp \frac{s^2 (n-1)}{\sigma^2} \sim \chi^2_{(n-1)} 	
+	\end{align*}
+	So, taking the ratio in the form of what is given to us in the previous lemma gives: 
+	\begin{align*}
+		\frac{\sqrt{n} \frac{\overline{X} - \mu}{\sigma}}{\sqrt{\frac{s^2(n-1)}{\sigma^2 (n-1)}}} = \frac{\sqrt{n} (\overline{X} - \mu)}{\sqrt{s^2} } \sim t_{(n-1)} 
+	\end{align*}
+	where we obtain the distribution from the previous lemma. 
+\end{proof}
+The student-t model forms a nice statistical model for certain types of data. 
+
+\subsection{F-Test Basis}
+
+If we want to compare quality, we need to standardise by variance. The following section helps answer the question, \textbf{is the variance between two samples the same?}
+
+\begin{definition}[The Fischer-Snedecor's F Distribution with Two Parameters $v_1$ and $v_2$ degrees of freedom] This distribution is denoted by $F_{v_1, v_2} $. This is the distribution of the following: 
+\begin{align*}
+	\frac{V_1 / v_1}{V_2/v_2}	
+\end{align*}
+	where $V_1 \sim \chi_{v_1}^2$, $V_2 \sim \chi_{v_2}^2$, and $V_1 \perp V_2$. 
+\end{definition}
+
+This will lead to the $F$-test. 
+
+\begin{theorem}
+	If $X_1, ..., X_n$ is a random sample from $N(\mu_x, \sigma_x^2)$, and $Y_1, ..., Y_m$ is a random sample from $N(\mu_y, \sigma^2_y)$, and the two samples are \emph{independent}, $s_x^2$ and $s_y^2$ are the sample variances, then: 
+	\begin{align*}
+		\frac{s^2_x / \sigma^2_x}{s^2_y / \sigma^2_y }	 \sim F_{n-1, m-1} 
+	\end{align*}
+\end{theorem}
+
+\begin{proof}
+	From the previous result and independence, we have: 
+	\begin{align*} 
+		\frac{(n-1)s_x^2}{\sigma_x^2} \sim \chi_{(n-1)}^2  \\
+		\frac{(m-1)s_y^2}{\sigma_y^2} \sim \chi_{(m-1)}^2
+	\end{align*} 
+	are independent. If we divide by the degrees of freedom and invoke the definition of the F distribution, we obtain the desired result. 
+	\begin{align}
+		\frac{s_x^2 / \sigma_x^2}{s_y^2 / \sigma_y^2} \sim F_{(n-1), (m-1)} 
+	\end{align}
+\end{proof}
+	This forms the basis of the F-test. If we want them to have the same variances, then $s_y^2$ and $s_x^2$ had better be close. The way to assess this is to look at ratios, and then the $\sigma^2$'s will drop out and we can then test hypotheses. Moreover, if $\sigma_x^2 = \sigma_y^2$, then: 
+	\begin{align*}
+		\frac{s_x^2}{s_y^2} \sim F_{(n-1), (m-1)} 
+	\end{align*}
+	we will later use this to construct the so-called \textbf{F-test}. 
+	
+	\subsection{Limiting Sample Distributions (Asymptotics)}
+	
+\begin{center}
+	What happens as $n \rightarrow \infty$? These questions are answered by \dfn{Weak Law of Large Numbers} and \dfn{Convergence in Distribution.} 
+\end{center}
+
+More precisely, let $X_1, ..., X_n$ be iid from F. Then, define $T_n := \stat$ be a real-valued statistic. Then: 
+
+\begin{center}
+	\textbf{Q1:} Does $T_n$ converge in probability to an estimator $\theta \in \R$? 
+	\begin{align}
+			\forall \varepsilon > 0\ \pr{ | T_n - \theta | > \varepsilon } \rightarrow 0\ \text{ as } n \rightarrow \infty 
+	\end{align} 
+	\textbf{Q2:} What happens to the distribution as $n \rightarrow \infty$? In other words, if $(r_n)$ is a sequence of real numbers, typically such that $r_n \rightarrow \infty$ ad $n \rightarrow \infty$, does
+	\begin{align} 
+			r_n ( T_n - \theta) \xrightarrow[]{d} T
+	\end{align}
+	What the $(r_n)$ is doing is that it is ``zooming'' into $T_n \rightarrow \theta$.  
+	\textbf{Idea:}  when n is ``large enough'': 
+	\begin{align*} 
+		r_n(T_n \rightarrow \theta) \xrightarrow[]{d} T_n \frac{T}{r_n} + \theta 
+	\end{align*}
+\end{center}
+where the final term is called the \dfn{location and scale model}. This may have a nice distribution. The distribution of $\frac{T}{r_n} - \theta$ is often called the \dfn{large-sample} or \dfn{(asymptotic) distribution of} $T_n$ or the \dfn{limiting distribution} of $T_n$. This is fundamental for quantifying uncertainty and for hypothesis testing. 
+
+\subsubsection{Question 1}
+
+First we will have a refresher from Math 356. The prime tool for convergence in probability is the Weak Law of Large Numbers. 
+
+\begin{theorem}[Weak Law of Large Numbers] 
+	Let $X_1, X_2, ...$ be iid random variables with $\EX{X_i} = \mu$ and Var$[X_i] = \sigma^2 < \infty$. Define 
+	\begin{align}
+		\overline{X_n} :=  \frac{1}{n} \sum_{i=1}^n X_i
+	\end{align}
+	then, $\overline{X_n}$ converges in probability to the expected value of $X$. 
+\end{theorem}
+
+\begin{theorem}[Continuous Mapping Theorem]
+	If $T_n \xrightarrow[]{P} T$ and $g$ is continuous on the set $C$ such that $\pr{T \in C} =1$, then $g(T_n) \xrightarrow[]{P} g(T)$. 
+\end{theorem}
+	In particular, if $T_n \xrightarrow[]{P} \theta$ and if $g$ is continuous at $\theta$, then $g(T_n) \xrightarrow[]{P} g(\theta)$.
+	
+\begin{ex}[Another justification for the sample variance]
+	Let $X_1, ..., X_n$ be a random sample from $X$ (i.e., from $F$ with $X \sim F$), and assume that $\EX{X^2} < \infty$. Then, by the WLLN, $\overline{X} \xrightarrow[]{P} \EX{X}$. For the sample variance:
+	\begin{align*}
+	s^2 = \frac{1}{(n-1)	} \sum_{i=1}^n (X_i - \overline{X})^2 = \frac{1}{(n-1)} \sum_{i=1}^n X_i^2 - \frac{n}{(n-1)} (\overline{X})^2	
+	\end{align*}
+	Applying the weak law of large numbers to the first term and the continuous mapping theorem to the second term gives us that the difference will converge in probability to:
+	\begin{align*}
+		\EX{X^2} - (\EX{X})^2	= \text{Var}[X]
+	\end{align*}
+	since the square root is continuous: 
+	\begin{align*}
+		s = \sqrt{s^2} \xrightarrow[]{P} \sqrt{\text{Var}[X]} 	
+	\end{align*}
+\end{ex} 
+
+\begin{ex}
+	Let $X_1, ..., X_n$ be a random sample from $X$. Suppose that we are after $\pr{ X \in A}$. This can be estimated by the \textbf{empirical probability}, which counts how many $x$'s fall into $A$. Set $Z_i$ $:= \chi_{X_i \in A} $. Then, the $Z_i$ are iid Bernoulli random variables. Using the Weak Law of Large Numbers: 
+	\begin{align*}
+		\mathbb{P}_n \xrightarrow[]{P} \pr{X \in A} 	
+	\end{align*}
+	which is the expected value of a Bernoulli random variable. By the Strong Law of Large numbers: 
+	\begin{align*}
+		\mathbb{P}_n  \rightarrow \pr{X \in A} \text{  a.s. 	} 
+	\end{align*}
+	Since $F$ is the CDF of $X$, we can try to learn it from the data. For $x \in \R$, $F(x) = \pr{X \leq x} $. The \dfn{empirical distribution function} $F_n$ is given by: 
+	\begin{align}
+		F_n(x) := \frac{1}{n	} \sum_{i=1}^n \chi_{X_i \leq x} 
+	\end{align}
+	This is a central object in mathematical statistics. 
+\end{ex}
+
+Given an observed sample $x_1, ..., x_n$, a sample empirical CDF is given by: 
+\begin{align}
+	F_n(x) = \frac{1}{n	} \sum_{i=1}^n \chi_{x_i \leq x} 
+\end{align}
+
+This is a CDF itself. It is a CDF with a discrete distribution with support $\{ x_1, ..., x_n \}$ and $\pr{x_i} = 1/n$. By the Weak Law of Large Numbers: 
+\begin{align*}
+	F_n(x) = \frac{1}{n} \sum_{i=1}^n \chi_{X_i \leq x} \xrightarrow[]{P} F(x)	
+\end{align*}
+for $\forall x \in \R$. Actually, by the strong law of large numbers: 
+\begin{align*}
+	F_n(x) \rightarrow F(x)\ a.s. 	
+\end{align*}
+for any $x \in \R$. 
+
+\begin{theorem}[Glivenlco-Cantelli Theorem] 
+	We have uniform convergence: 
+	\begin{align}
+		\sup_{x \in \R} |F_n(x) - F(x) | \rightarrow 0 \text{ as } n \rightarrow \infty 
+	\end{align}
+\end{theorem}
+Notice that: 
+\begin{align}
+	\overline{X} = \frac{1}{n} \sum_{i=1}^n X_i = \idx{}{} x dF_n(x) 
+\end{align}
+
+
+\subsubsection{Question 2}
+We will need the following tools from probability: the Central Limit Theorem and Slutsky's theorem. 
+
+\begin{theorem}
+	Let $Z_1, ..., Z_n$ be iid with $\EX{Z_i} < \infty$, $\EX{X_1} = \mu$, var$[Z_1] < \infty$, and var$[Z_i] = \sigma^2$. Then, the \dfn{Central Limit Theorem} states: 
+	\begin{align}
+		\sqrt{n} \frac{\overline{Z} - \mu}{\sigma} \xrightarrow[CLT]{} N(0,1) 
+	\end{align}
+	or 
+	\begin{align}
+		\sqrt{n} ( \overline{Z} - \mu) \xrightarrow[CLT]{} N(0, \sigma^2) 
+	\end{align}
+\end{theorem}
+
+\begin{theorem}[Slutsky's Theorem]
+	Assume that $T_n \xrightarrow[]{d} T$, $Y_n \xrightarrow[]{p} c$ where $c \in \R$. Then: 
+	\begin{enumerate}[noitemsep]
+		\item $T_n + Y_n \xrightarrow[]{d} T + c $ 
+		\item $T_n \cdot Y_n \xrightarrow[]{d} T \cdot c$ 
+		\item $T_n / Y_n \xrightarrow[]{d} T/c$ if $c \neq 0$. 
+	\end{enumerate}
+\end{theorem}
+
+\dfn{Remarks}: If $T_n \xrightarrow[]{d} c$ where $c \in \R$, then $T_n \xrightarrow[]{p} c$. Moreover, we can say something with the CMT. If $T_n \xrightarrow[]{d} T$, $g$ is continuous on $C$ with $\pr{T \in C} = 1$. Then, $g(T_n) \xrightarrow[]{d} g(T)$. 
+
+\dfn{Important remark}: if $(r_n)$ is a sequence of numbers, $r_n \rightarrow \infty$ as $n \rightarrow \infty$. Then, if $r_n (T_n - \theta) \xrightarrow[]{d} T$, then we have: 
+\begin{align*} 
+	T_n - \theta = \underbrace{r_n(T_n - \theta)}_{\xrightarrow[]{d} T} \underbrace{ \frac{1}{r_n}	}_{\rightarrow 0} \xrightarrow[\text{slutskys's}]{d} 0 
+\end{align*}
+So, $T_n - \theta \xrightarrow[]{p} 0$, or $T_n \xrightarrow[]{d} \theta$. This means that the second statement implies the first statement. 
+
+\begin{ex}[Alternative proof of the CLT] 
+		Let $X_1,..., X_N$ be iid from $F$, $\EX{X} = \mu$, Var$[X] = \sigma^2 < \infty$ (this assumption is very important!) 
+		\begin{align}
+			\sqrt{n} \frac{\overline{X} - \mu}{\sqrt{s^2}} = \underbrace{\frac{\sqrt{n} (\overline{X} - \mu)}{\sigma}}_{\text{By vanilla CLT, this goes to} N(0,1)} \cdot \underbrace{\frac{\sigma}{\sqrt{s^2}}}_{\xrightarrow[]{p} 1}
+		\end{align}
+		and so by Slutsky's theorem 
+		\begin{align*} 
+			\xrightarrow[]{d} N(0,1) 	
+		\end{align*}
+\end{ex}
+
+\begin{corollary} Assume that each $T_n \sim t_n$ (student-t with $n$ degrees of freedom). Then $T_n \xrightarrow[]{d} N(0,1)$. 
+	
+\end{corollary}
+
+\begin{ex}
+	Suppose $X_1, ..., X_n$ are iid from Bernoulli$(p)$. Suppose that we want to estimate var$[X_1] = p(1-p)$. \textbf{Q:} could we estimate it by: 
+	\begin{align*}
+		\overline{X}(1- \overline{X} ) \xrightarrow[P]{CMT} p(1-p)	
+	\end{align*}
+	More precisely, can we find a sequence $(r_n)$ such that
+	\begin{align*}
+		(r_n) (\overline{X}(1-\overline{X}) - p(1-p) ) \xrightarrow[]{d} ?? 	
+	\end{align*}
+	This is not exactly the CMT; this example provides the motivation for developing the \dfn{delta method}. Suppose that we know that $r_n(T_n - \theta) \xrightarrow[]{d} T$ and we are interested in $g(T_n) - g(\theta)$. What could we do? We could use the Taylor Expansion: 
+	\begin{align*}
+		& g(T_n) - g(\theta) \approx g'(\theta) (T_n - \theta) 	\\
+		& (r_n) (g (T_n) - g(\theta) ) \approx g'(\theta) \{ r_n (T_n - \theta) \} 
+	\end{align*}
+	By Slutsky's theorem, $r_n(T_n - \theta)$ converges in distribution to $T \cdot g'(\theta)$. 
+\end{ex}
+
+\begin{theorem}[Delta Method]
+	Suppose $(r_n)(T_n - \theta) \xrightarrow[]{d} T$, where $(r_n)$ is a real sequence with $r_n \rightarrow \infty$. Let $g$ be a function and $T_n$ takes values in the domain of $g$, and assume that $g$ is \emph{differentiable} at $\theta$. Then: 
+	\begin{align}
+		r_n ( g(T_n) - g(\theta)) \xrightarrow[]{d} T \cdot g'(\theta) 
+	\end{align}
+\end{theorem}
+Proof will be postponed. Back to the example. Here: 
+\begin{align*}
+	& g(x) = x(1-x) \\
+	& g'(x) = 1-2x 	
+\end{align*}
+By the central limit theorem
+\begin{align*}
+	(\overline{X} - p) \sqrt{n} \xrightarrow[]{d} N (0, p(1-p)) 	
+\end{align*}
+Let $\sqrt{n} := (r_n)$. Then, by the delta method
+\begin{align*}
+	\sqrt{n} (\overline{X} (1 - \overline{X} ) - p(1-p)) & \xrightarrow[]{d} N(0, p(1-p)) \cdot (1-2p) \\ 
+		& = N(0, (1-2p)^2p(1-p)) 
+\end{align*}
+When $p=1/2$, the statement is uninteresting since the derivative is zero. We will have both convergence in probability and distribution to zero, which doesn't give us any information really. 
+
+We are now ready to prove the delta method. 
+
+\begin{proof}
+	This proof uses several common arguments that you should learn for stats :-). Observe that by the continuous mapping theorem, $T_n \xrightarrow[]{p} \theta$, also $g(T_n) \xrightarrow[]{p} g(\theta)$. Define the following function: 
+	\begin{align*}
+		& f: \R \rightarrow \R \\
+		& h \mapsto \begin{cases}
+			\frac{g(\theta + h) - g (\theta)}{h} - g'(\theta) & \text{ if } h \neq 0 \\
+			0 	& \text{ if } h = 0 
+		\end{cases}	
+	\end{align*}
+	Here, the interesting domain is small and is about zero. Observe that $f$ is continuous at zero. Now we can use the continuous mapping theorem: 
+	\begin{align*}
+			f(T_n - \theta) \xrightarrow[]{p} f(0) = 0 
+	\end{align*}
+	since the first term is equal to 
+	\begin{align*}
+		\frac{g(T_n) - g(\theta)}{T_n - \theta} - g'(\theta) 		
+	\end{align*}
+	By Slutsky's theorem: 
+	\begin{align*} 
+		& r_n (g(T_n) - g(\theta)) - g'(\theta ) r_n [T_n - \theta ] \\ 
+		& = \underbrace{r_n [T_n - \theta]}_{\xrightarrow[]{d} T} \underbrace{f(T_n - \theta)}_{\xrightarrow[]{p} \theta} \xrightarrow[]{d} T \cdot 0 = 0 
+	\end{align*} 
+	where the last convergence follows from Slutsky's theorem. Therefore: 
+	\begin{align*}
+		r_n (g(T_n) - g(\theta)) - g'(\theta)r_n [T_n - \theta ] \xrightarrow[]{p} 0 	
+	\end{align*}
+	Now: 
+	\begin{align*}
+	r_n[g(T_n) - g(\theta)] = \underbrace{r_n [g(T_n) - g(\theta)] - g'(\theta)r_n(T_n - \theta)}_{\xrightarrow[]{p} 0} + \underbrace{g'(\theta)(T_n - \theta) \cdot r_n 	}_{\xrightarrow[]{d} g'(\theta)T\ (CMT)}
+	\end{align*}
+	and so by Slutsky's theorem, we obtain convergence in distribution to $g'(\theta)T$, which completes the proof.
+\end{proof}
+
+\subsection{Order Statistics}
+\begin{definition}[Order Statistics]
+	The \dfn{order statistics} of a random sample $X_1, ..., X_n$ are the sample values placed in ascending order. They are denoted by $X_{(1)}, ..., X_{(n)}$. In other words, they are random variables that satisfy $X_{(1)} \leq \cdots \leq X_{(n)}$. In particular: 
+	\begin{align*}
+		& X_{(1)} = \min_{1 \leq i \leq n} X_i \\
+		& X_{(2)} = \text{ second smallest } X_i \\
+		& \vdots 	\\
+		& X_{(n)} = \max_{1 \leq i \leq n } X_i 
+	\end{align*}
+\end{definition}
+
+
+\begin{definition}[Sample Range]
+	The \dfn{sample range} is defined as $R:= X_{(n)} - X_{(1)}$. 
+\end{definition}
+
+\begin{definition}[Sample Median]
+	The \dfn{sample median}, denoted by $M$, is the number such that approx one half of the observations are less than $M$ and one half are greater. It can be defined in terms of the order statistics as: 
+	\begin{align*}
+		M := \begin{cases}
+			X_{(n+1)/2} & \text{ if $n$ is odd} \\
+			\frac{X_{(n/2)} + X_{(n/2+1)}}{2} & \text{ if $n$ is even}
+		\end{cases}	
+	\end{align*}
+\end{definition}
+
+\section{Point Estimation}
+Let $X_1, ..., X_n$ be a random sample from $F$, and we will \emph{assume}: 
+\begin{align*}
+F \in \dist = \{ F_\theta,\ \theta \in \Theta \} 
+\end{align*}
+This means that our distribution is known up to a parameter $\theta$. $\theta$ is an unknown vector of parameters. $\Theta$ is called the \dfn{parameter space}, $\Theta \subseteq \R^k$. \textbf{Question:} where does $\Theta$ come from? This is the ``art'' of statistical modelling. The objective in this section is to learn $\theta$ from the data. 
+
+
+\textbf{Notation}: $F_\theta$ is a CDF. $P_\theta$ is the corresponding probability measure. $F_\theta$ has a density / probability mass function, which we will denote by $f(x, \theta)$. This notation emphasises the dependence on $\theta$. 
+
+
+\begin{ex}
+Assume that we have the normal model. Then: 
+\begin{align*}
+	\dist = \{ N(\mu, \sigma^2),\ \mu \in \R, \sigma^2 > 0 \} 	
+\end{align*}
+	Here, $\theta = (\mu, \sigma^2)$ and the parameter space $\Theta = \R \times ]0, \infty[$. 
+\end{ex}
+
+\begin{definition}[Point Estimator]
+	A \dfn{point estimator} is any statistic $\stat$ (function of only the data) taking values in $\R^k$ that has been constructed with the aim of estimating $\theta$. The observed value $T(x_1, ..., x_n)$ is called an \dfn{estimate} of $\theta$, which is a concrete number. 
+\end{definition}
+
+This definition is vague since we do not want to eliminate important estimates a priori. Often, estimators are denoted with $\hat{\theta}, \tilde{\theta}, \theta_n,$ or $ \hat{\theta_n}$. 
+
+
+\subsection{Ways We Can Construct Estimators}
+We will explore two of these methods in depth in this class. The third we will briefly mention. The first two are frequentist methods and the final one is a bayesian method. 
+\begin{enumerate}[noitemsep]
+	\item Method of moments
+	\item Method of maximum likelihood 
+	\item Bayesian estimation method 
+\end{enumerate}
+
+\subsubsection{Method of moments}
+	This is the oldest method. It was developed in the 19th century by Karl Pearson. It has been what we heuristically have been doing all along. Suppose that $X \sim F_\theta$. Then, as an idea we could first calculate the jth moment $\mu_j$ of $X$ for $j=1,..., k$, that is: 
+	\begin{align*}
+			\mu_j = \EXth{X^j} = \idx{}{} x^j dF_\theta (x) = \idx{}{} x^j dP_\theta = \idx{}{} x^j f(x; \theta) dx  
+	\end{align*}
+	\textbf{How would we estimate $\mu_j$ from the data?} By the weak law of large numbers, $\mu_j$ can be estimated by the jth sample moment: 
+	\begin{align*}
+		\mu_j = \frac{1}{n} \sum_{i=1}^n X_i^j 	
+	\end{align*}
+	observe that this $\mu_j$ is a function of $\theta$. Thus, the general idea of the method of moments is: 
+	\begin{center}
+		Compute the jth moment of the parametric model. Then, solve for $\theta$: 
+		\begin{enumerate}[noitemsep]
+			\item Calculate the population moments $\mu_j$, $j=1,..., k$ (the first $k$ moments), and observe that $\mu_j$ is a function of $\theta$. 
+			\item Set $\mu_j = m_j$ for $j=1,..., k$ and solve for $\theta$. Start with $j=1$ and see where it takes us. 
+		\end{enumerate}
+	\end{center}
+	Note that sometimes you may need more moments than the first $k$< since some moments may not actually depend on $\theta$ (they could be zero, for example). 
+	
+	\begin{ex}[Method of moments for the normal distribution] Let $\dist = \{ N(\mu, \sigma^2)\ |\ \mu \in \R, \sigma^2 > 0 \}$. Here, since we have two parameters to estimate, we need at least two moments. We have: 
+	\begin{align*}
+		\EX{X} = \mu \text{ 		} \EX{X^2} = \text{var}[X] + (\EX{X})^2	= \sigma^2 + \mu^2 
+	\end{align*}
+	Now equate the population moments and solve for $\theta$. That is, we need to solve: 
+	\begin{align*}
+		& m_1 = \frac{1}{n} \sum_{i=1}^n X_i = \mu \\
+		& m_2 = \frac{1}{n} \sum_{i=1}^n X_i^2 = \sigma^2 + \mu^2 	
+	\end{align*}
+	and this gives us
+	\begin{align*}
+		& \hat{\mu} = m_1 \\
+		& \hat{\sigma}^2 = m_2 - \hat{\mu}^2		
+	\end{align*}
+	Substituting in what all of this means gives us: 
+	\begin{align*}
+		& \hat{\sigma}^2 = \frac{1}{n}	\sum_{i=1}^n X_i^2 - \left( 	\sum_{i=1}^n X_i \right)^2 = \frac{1}{n} \sum_{i=1}^n (X_i - \overline{X})^2 = \frac{(n-1)}{n} s^2  
+	\end{align*}
+	Hence, the estimator (\dfn{method of moments estimator}) for $(\mu, \sigma^2)$ is: 
+	\begin{align*}
+		(\hat{\mu}, \hat{\sigma}^2) = \left( \overline{X}, \frac{(n-1)}{n} s^2 \right) 	
+	\end{align*}
+	\end{ex}
+	
+\textbf{Q: What are some advantages and disadvantages of the method of moments?}
+	
+Some advantages include: 
+	\begin{enumerate}[noitemsep]
+		\item It is intuitive. 
+		\item Population moments are easy to estimate and we know how they behave asymptotically. 
+		\begin{enumerate}[noitemsep]
+			\item Weak law of large numbers and the CLT. 
+		\end{enumerate}
+		\item Asymptotic properties of $\hat{\theta}$ can often be derived using the CMT and the Delta Method. 
+	\end{enumerate}
+	
+Some disadvantages include (``the bitter reality''): 
+	\begin{enumerate}[noitemsep]
+		\item There is a systematic bias for $n$ small, which is encoded by the $(n-1)/n$ term. 
+		\item These estimators are often not optimal. 
+	\end{enumerate}
+	
+
+\begin{ex}[Method of moments for binomial] 
+	Let our model be $\dist = \{ B(N,p),\ p \in [0,1],\ N=\{ 1,... \} \} $. There are two cases: $N$ can either be known or known. If $N$ is known, then it is easy. In this case, $\theta = p$ and $\Theta = [0,1]$. In this case: 
+	\begin{align*}
+		& \mu_1 = Np \\
+		& m_1 = Np \Rightarrow \hat{p} = \frac{m_1}{N}	 = \frac{\overline{x}}{N}
+	\end{align*}
+	The not so easy case is when both $p$ and $N$ are unknown. We have the following system of equations: 
+	\begin{align*}
+		& \mu_1 = Np 	\\
+		& \mu_2 = Np(1-p) + (Np)^2 
+	\end{align*}
+	We thus have the following system of equations that we need to solve: 
+	\begin{align*}
+		& m_1 = Np \\	
+		& m_2 = Np - Np^2  + N^2p^2 
+	\end{align*}
+	Solving for $\hat{p}$ gives: 
+	\begin{align*}
+		\hat{p} = \frac{m_1}{N}	
+	\end{align*}
+	Substituting this estimation into the second equation and simplifying gives: 
+	\begin{align*}
+		& m_2 = m_1 - \frac{m_1^2}{N^2} N(n-1) \\
+		 \Rightarrow &  m_2 	= m_1 + \frac{m_1^2}{N} (N-1) \\
+		 \Rightarrow & Nm_2 = Nm_1 + m_1^2 (N-1) \\
+		 \Rightarrow & N(m_2 - m_1 - m_1^2) = -m_1^2 
+	\end{align*}
+	What if $X_1 = ... = X_n = 0$? This event has non-zero probability, and so we must account for it. In that case, there is nothing more we can do. Otherwise, we obtain: 
+	\begin{align*}
+		& \hat{N} = \begin{cases}
+				\frac{-m_1^2}{m_2 - m_1 - m_1^2} \\
+				\text{undefined if } X_1 = ... = X_n = 0 
+		\end{cases}	 \\
+		& \hat{p} = \frac{-m_2 - m_2 - m_1^2}{m_1} \text{ or undefined in the case } X_1 = ... = X_n = 0 
+	\end{align*}
+	So, our method of moments (MoM) estimator of $(p, N)$ is: 
+	\begin{align*}
+		\left( \frac{-m_2 + m_1 + m_1^2}{m_1} , \frac{m_1^2}{-m_2 + m_1 + m_1^2}  \right) = \left( \frac{\overline{X} - \frac{1}{n} \sum_{i=1}^n (X_i - \overline{X})^2}{\overline{X}} , \frac{(\overline{X})^2}{\overline{X} - \frac{1}{n} \sum_{i=1}^n (X_i - \overline{X})^2}  (*) \right) 	
+	\end{align*}
+\end{ex}
+	Observations from this example: 
+	\begin{itemize}[noitemsep]
+		\item Estimating $N$ was not very intuitive. 
+		\item There is no guarantee that the second component of (*) is an integer or non-negative. This is why we chose such a vague definition of an estimator; because we don't want to exclude this method. 
+		\item Estimating $N$ for the binomial is quite difficult. 
+	\end{itemize}
+	
+	Here is an example where $\theta$ determines the support of the random variable. 
+	
+\begin{ex} 
+	Let $\dist = \{ U (]-\theta, \theta[),\ \theta \in ]0, \infty[ \}$. 	Since the expected value is zero, we will need more moments. Recall the following from probability theory: if $X \sim U(]a,b[)$, then: 
+	\begin{align*}
+		\EX{X} = \frac{a+b}{2} 	\text{ and } \text{var}[X] = \frac{1}{2} (b-a)^2
+	\end{align*}
+	then the moments are: 
+	\begin{align*}
+		& \mu_1 = 0 \\
+		& \mu_2 = \frac{1}{2} (2 \theta)^2 = 2 \theta 	
+	\end{align*}
+	this is good since it is a genuine function of $\theta$. Set: 
+	\begin{align*}
+		\mu_2 = m_2	
+	\end{align*}
+	and solve the following to obtain the method of moment estimator: 
+	\begin{align*}
+		2 \theta^2 = m_2 \Rightarrow \hat{\theta} = \sqrt{\frac{m_2}{2}} = \sqrt{\frac{\frac{1}{n} \sum_{i=1}^n X_i^2}{2}}	
+	\end{align*}
+	Observe that $\theta$ could theoretically be zero. But, since this is a continuous distribution, the probability of $\theta$ actually being zero is zero. 
+\end{ex}
+
+
+	
+
+\subsubsection{Method of Maximum Likelihood}
+This is more optimal, but it can be harder to obtain. Assume that $F_\theta$ has a PDF or PMF for any $\theta \in \Theta$. Recall that we denoted this PMF by $f(x; \theta)$ to emphasise the dependence on $\theta$. Before proceeding, a word of caution: 
+
+\begin{center}
+	\textbf{The likelihood function is NOT RANDOM}!!! 
+\end{center}
+
+\begin{definition}[Likelihood Function]
+	Given that $(X_1, ..., X_n) = (x_1, ..., x_n)$ have been observed, the function of $\theta$ defined by $L: \Theta \rightarrow [0, \infty[$,
+	\begin{align}
+		L(\theta) := \prod_{i=1}^n f(x_i; \theta) 
+	\end{align}
+	is called the \dfn{likelihood function} for a fixed $x = (x_1, ..., x_n)$ as a function of $\theta$. 
+\end{definition}
+
+\begin{ex} 
+	Suppose that $x_1 = 1$, $x_2 = 2$, $x_3 = 2$, and $x_4 =5$ and that we assume the Poisson model: 
+	\begin{align*}
+		\dist = \{ P(\lambda),\ \lambda \in ]0, \infty[ \} 	
+	\end{align*}
+	then, the likelihood function is: 
+	\begin{align*}
+		L(\lambda; x) = e^{-\lambda} \frac{\lambda^1}{1!}	+  e^{-\lambda} \frac{\lambda^2}{2!} +  e^{-\lambda} \frac{\lambda^3}{2!} +  e^{-\lambda} \frac{\lambda^4}{5!}
+	\end{align*}
+\end{ex}
+
+We can think of the Likelihood function as a sort of ``function summary'' whose domain is the parameter space. 
+
+
+\dfn{Interpretation of the Likelihood Function}: 
+\begin{enumerate}[noitemsep]
+	\item If $F_\theta$ is discrete, then: 
+	\begin{align*}
+		L(\theta; x) = \pr{X_1 = x_1, ..., X_n = x_n}	
+	\end{align*}
+	It is simply the product of the PMFs. It thus represents the probability of observing the sample that we actually observed. Moreover, if for some $\theta_1, \theta_2 \in \Theta$, if $L(\theta_1; x) > L(\theta_2; x)$, then it means that we were more likely to observe that data if the parameter is $\theta_1$ instead of $\theta_2$. Thus, \emph{information is encoded in the function}. 
+	\item If the distribution $F_\theta$ is continuous, then this interpretation will obviously not work. However, we can do the usual ``trick'': 
+	\begin{align*}
+		\mathbb{P}_\theta [ X \in ]x - \varepsilon, x + \varepsilon [ ]  = \idx{x - \varepsilon}{x + \varepsilon} f (t; \theta) dt \approx f(x; \sigma) \cdot 2 \varepsilon	
+	\end{align*}
+	It is thus proportional up to a constant depending on $\varepsilon$. Mathematically: 
+	\begin{align*}
+		L(\theta; x) \propto \pr{X_1 \in ]x_1 - \varepsilon, x_1 + \varepsilon[,\ ..., X_n \in ]x_n - \varepsilon, x_n + \varepsilon [} 	
+	\end{align*}
+	Similar to the discrete case, comparing $L(\theta_1; x)$ with $L(\theta_2; x)$ will give us a comparison of the probability of the actual observed sample. 
+\end{enumerate}
+So the aim is to find a way maximise the likelihood function in $\theta$. 
+
+\begin{definition}[Maximum Likelihood Estimate] 
+	For an observed sample $x = (x_1, ..., x_n)$, let $\hat{\theta}(x)$ be the value for which $L$ is maximised. In other words: 
+	\begin{align}
+		L(\hat{\theta}(x); x) := \sup_{\theta \in \Theta} L(\theta; x) 
+	\end{align}
+	Then, $\hat{\theta}$ is called the \dfn{maximum likelihood estimate}. (Grounding: it is a number, not an object). If $\hat{\theta}(x)$ exists for almost all samples, and as a function: 
+	\begin{align*}
+		\hat{\theta}: \R^n \rightarrow \R^k,\ x \mapsto \hat{\theta}(x) 	
+	\end{align*}
+	is a measurable, then the \emph{function} $\hat{\theta}(X)$ is called the \dfn{Maximum Likelihood Estimator (MLE)} of $\theta$. 
+\end{definition}
+
+\begin{ex}[Continued from the Poisson Case] Let $x_1, ..., x_n$ be a sample from the Poisson distribution. Then, the aim is to maximise: 
+	\begin{align*}
+		L(\theta; x ) = \prod_{i=1}^n e^{-\lambda} \frac{\lambda^{x_i}}{x_i!}	= e^{-n\lambda} \frac{\lambda^{\sum_{i=1}^n x_i}}{x_1! \cdots x_n!}
+	\end{align*}
+	You \emph{could} differentiate this monstrosity, but differentiating products is in general not fun. However, sums are not too bad to differentiate. So, observe that this function is:
+	\begin{enumerate}[noitemsep]
+		\item Positive
+		\item Wherever $\log(L)$ is maximised, $L$ is maximised. 
+	\end{enumerate}
+	So we can equivalently maximise $\log(L(\lambda; x))$. Thus: 
+	\begin{align*}
+		& \log L(\lambda; x)  = \ell(\lambda; x) = -n \lambda + \sum_{i=1}^n x_i \log(\lambda) - \log(x_1! \cdots x_n! ) 	\\
+		\Rightarrow & \frac{\partial \ell(\lambda; x)}{\partial \lambda} = -n + \left( \sum_{i=1}^n x_i \right) \frac{1}{\lambda} = 0 \iff n \lambda = \sum_{i=1}^n x_i \\
+		\Rightarrow & \hat{\lambda}(x) = \overline{x} 
+	\end{align*}
+	Take the second partial derivative to verify that this is indeed a maximum. 
+	\begin{align*}
+		\frac{\delta \ell^2}{\delta \lambda} = - \frac{1}{\lambda^2} \sum_{i=1}^n x_i < 0 	
+	\end{align*}
+	This, the MLE is $\overline{x}$. 
+\end{ex}
+Some observations for calculating maximum likelihood estimators: 
+\begin{enumerate}[noitemsep]
+	\item It is often simpler to maximise the \dfn{log likelihood function}, which is defined as: 
+	\begin{align}
+		\ell(\theta; x) := \log L(\theta; x) 
+	\end{align}
+	\item If $\ell$ is differentiable, we can look for the maximum by solving the so-called \dfn{likelihood equations}: 
+	\begin{align}
+		\frac{\partial \ell}{\partial \theta_j} = 0\ j=1,..., k
+	\end{align}
+\end{enumerate}
+
+\begin{ex}
+	Let $x_1, ..., x_n$ be a random sample from $B(N, p)$, where $N$ is \emph{known}. Then, $\Theta = [0,1]$ and 
+	\begin{align*}
+		L(p; x) = \prod_{i=1}^n \binom{N}{x_i} p^{x_i} (1-p)^{N-x_i} 	
+	\end{align*}
+	thus, the log likelihood function $\ell$ is: 
+	\begin{align*}
+		\ell(p;x)  = \sum_{i=1}^n \left[ x_i \log(p) + (N-x_i) \log(1-p) + \underbrace{\log \binom{N}{x_i}	}_{\text{if $N$ were unknown, this would be a big mess}}		\right] 
+	\end{align*}
+	We are searching for critical points. Let's first assume that $\overline{x} \notin \{0, N \}$. We obtain: 
+	\begin{align*}
+		\frac{\partial \ell}{\partial p}	 = \left( \sum_{i=1}^n x_i \right) \frac{1}{p} + \left( nN - \sum_{i=1}^n x_i \right) \left( \frac{-1}{1-p} \right) 
+	\end{align*}
+	setting the partial derivative equal to zero and solving, we obtain: 
+	\begin{align*}
+		& \frac{n\overline{x}}{p} - \frac{n(N-\overline{x})}{1-p} = 0 \\
+		\Rightarrow & \frac{\overline{x}(1-p)-(N-\overline{x})}{p(1-p)} = 0 \\
+		\Rightarrow & \overline{x}(1-p) - (N \overline{x})p = 0 \\
+		\Rightarrow & \overline{x} - \overline{x} p - N p + \overline{x} p = 0 \\
+		\Rightarrow & p  = \frac{\overline{x}}{N}	
+	\end{align*}
+
+\end{ex}
+Thus, $p = \overline{x} / N$ is the method of moments estimator. We now need to verify that this is indeed a maximum with the second derivative test: 
+\begin{align*}
+	\frac{\partial^2 \ell}{\partial^2 p}	 = -n \overline{x} \frac{1}{p^2} + \underbrace{(nN - n \overline{x})}_{\geq 0 } \frac{-1}{(1-p^2)} < 0  \text{ (concave in $p$) } 
+\end{align*}
+We now need to check the boundary cases. If $\overline{x} = 0$, then 
+\begin{align*}
+	\ell(p; x) = nN \log (1-p) 	
+\end{align*}
+This function is decreasing in $p$, which implies that it is maximised at $p=0 = \frac{\overline{x}}{N}$. If $\overline{x} = N$, then $x_i = N\ \forall\ i \in \{ 1, ..., N \}$. This is an increasing function in $p$, which implies that it is maximised at $p=1$, which implies that $\hat{p} = 1 = \overline{x}/N$ 
+
+For the past two examples, we've seen that the MLE estimator agrees with the method of moments examples. The following example will illustrate that this is not always the case. 
+\begin{ex} 
+	Let $x_1, ..., x_n$ be an observation of a random sample taken from the model: 
+	\begin{align*}
+		\dist = \{ \mathcal{U}]0, \theta [\ |\ \theta \geq 0 \} 	
+	\end{align*}
+	If $X \sim \mathcal{U}]0, \theta[$, then using the method of moments we have that: 
+	\begin{align*}
+		& \EX{X} = \theta/2 \\
+		& \frac{\theta}{2} = \smean \Rightarrow \hat{\theta} = 2 \overline{x}
+	\end{align*}
+	In contrast, using the method of maximum likelihood gives: 
+	\begin{align*}
+		L(\theta; x ) & = \prod_{i=1}^n \frac{1}{\theta} \chi_{x_i \in [0, \theta] } 	
+	\end{align*}
+	since $\chi$ depends on $\theta$, taking the log will not be a good idea. Instead, this becomes: 
+	\begin{align*}
+			& = \left( \frac{1}{\theta} \right)^n ( \chi_{\min_{1 \leq i \leq n} (x_i) \geq 0} )( \chi_{\max_{1 \leq i \leq n} (x_i) \leq \theta} )
+	\end{align*}
+	For almost all samples, we have: 
+	\begin{align*}
+		\min_{1 \leq i \leq n} x_i \geq 0	
+	\end{align*}
+	but for $\theta < \max (x_i)$ we have that $L=0$ but for $\theta \geq \max x_i$, $L$ is decreasing. Thus, the MLE is maximised at $\max_{1 \leq i \leq n} x_i$. Thus, 
+	\begin{align*}	
+		\hat{\theta(x)} = \max_{1 \leq i \leq n} X_i = X_{(n)}	
+	\end{align*}
+	is the MLE (to do: insert graph). 
+\end{ex}
+
+\begin{ex} 
+	Let $x_1, ..., x_n$ be a random sample from $N(\mu, \sigma^2)$ from the model
+	\begin{align*}
+		\dist = \{ N(\mu, \sigma^2)\ |\ \mu \in \R,\ \sigma^2 \in ]0, \infty[ \} 	
+	\end{align*}
+	Then: 
+	\begin{align*}
+		L(\mu, \sigma^2; x) = \prod_{i=1}^n \frac{1}{\sqrt{ 2 \sigma}} \frac{1}{\sqrt{\sigma^2} } \text{exp} \left\{ \frac{-(x_i - \mu)^2}{2 \sigma}		\right\} 	
+	\end{align*}
+	and so the log likelihood is: 
+	\begin{align*}
+		\ell(\mu, \sigma^2; x ) = \sum_{i=1}^N \left[ \log \frac{1}{\sqrt{2 \pi}} - \frac{1}{2} \log \sigma^2 - \frac{(x_i - \mu^2)}{2 \sigma^2}	\right] 
+	\end{align*}
+	taking the partials, we obtain: 
+	\begin{align*}
+		& \frac{\partial \ell}{\partial \mu} = - \sum_{i=1}^n \frac{2 (x_i -  \mu)^2 (-1)}{2 \sigma^2}	 = \frac{n \overline{x} - n \mu}{\sigma^2} \\
+		& \frac{\partial \ell}{\partial \sigma^2} = \sum_{i=1}^n \left[ 		-\frac{1}{2} \frac{1}{\sigma^2} + \frac{(x_i - \mu)^2}{2} \frac{1}{\sigma^4} \right] 
+	\end{align*}
+	setting $\frac{\partial \ell}{\partial \mu} =0$, we obtain that $\hat{\mu} = \overline{x}$. For the other one: 
+	\begin{align*}
+		& \frac{-n}{2} \frac{1}{\sigma^2} + \frac{1}{2 \sigma^4} \sum_{i=1}^n (x_i - \overline{x} )^2 = 0  \\
+		& n \sigma^2 = \sum_{i=1}^n (x_i - \overline{x})^2 \\
+		& \Rightarrow \hat{\sigma}^2 = \frac{1}{n} \sum_{i=1}^n (x_i - \overline{x})^2		
+	\end{align*}
+	\textbf{How do we prove that our values $\hat{\mu}$ and $\hat{\sigma}^2$ are indeed maximums}? The trick is to use something called the \dfn{profile likelihood}. Define: 
+	\begin{align}
+		\ell^*(\sigma^2) := \sup_{\mu \in \R} \ell (\mu, \sigma^2) 
+	\end{align}
+	we observe that if we maximise $\ell^*$, then this amounts to maximising the whole thing, since $\overline{x}$ minimises the sum $\sum_{i=1}^n (x_i - \mu)^2$. So all we need to do is maximise this:
+	\begin{align*}
+			\ell^*(\sigma^2) = \sum_{i=1}^n \log \frac{1}{\sqrt{2 \pi}} - \frac{1}{2} \log \sigma^2 - \frac{1}{2 \sigma^2} (x_i - \overline{x})^2
+	\end{align*}
+ 	the above is called the \dfn{profile likelihood univariate problem}. Solving the above gives you the $\hat{\sigma}^2$ that is the solution. 
+\end{ex}
+
+\subsubsection{Invariance of the MLE Theorem}
+\textbf{Motivation:} suppose that $X_1, ..., X_n$ are iid taken from Bernoulli$(p)$. In this case, we have that the method of moments and MLE method agree: 
+\begin{align*}
+	\hat{p} = \overline{x} = \hat{p}_{MLE} 	
+\end{align*}
+The standard deviation of $X_1 = \sqrt{ p (1-p)}$. We can estimate this by $\sqrt{\hat{p}(1-\hat{p})}$. This is a non-bijective function of $p$. In this sense, this is the MLE of the standard deviation, which motivates the idea of an invariance principle. 
+
+\begin{theorem}[Invariance of the MLE]
+	Consider a statistical model $\{ F_\theta\ |\ \theta \in \Theta \}$ and suppose that $g: \Theta \rightarrow \R^m$ is an \emph{arbitrary} function. Set $\Gamma := g(\Theta)$ and $\gamma := g (\theta)$. Then, if $\hat{\theta}(x_1, ..., x_n)$ is the maximum likelihood estimate of $\theta$, then $g(\hat{\theta}(x_1,..., x_n ) $ is the ML estimate of $\gamma$ in the following sense: if 
+	\begin{align}
+		L^*(\gamma; x_1, ... , x_n ) = \sup_{\theta \in \Theta\ |\ g(\theta) = \gamma } \left\{ L(\theta; x_1, ..., x_n)	\right\} 
+	\end{align}
+	then: 
+	\begin{align}
+		L^*(g(\hat{\theta}(x_1,..., x_n)); x_1,..., x_n) = \sup_{\gamma \in \Gamma} L^*(\gamma; x_1, ..., x_n ) 	
+	\end{align}
+\end{theorem}
+
+\begin{proof}
+	\begin{align*}
+	L^*(g(\hat{\theta} (x_1, ..., x_n)); x_1, ..., x_n ) & = \sup_{\theta\ |\ g(\theta) = g (\hat{\theta}) } \left\{ 	L(\theta; x_1, ..., x_n )	\right\} 	\\
+		& = L(\hat{\theta}; x_1, ..., x_n ) \text{ (since $\hat{\theta}$ is the maximiser)} \\
+		& = \sup_{\theta \in \Theta} L(\theta; x_1, ..., x_n) 
+	\end{align*}
+	Sup over the range of $g$, and then through the pre-image (just running through the $\theta$'s in a systematic way):
+	\begin{align*}
+		& = \sup_{\gamma \in \Gamma} \underbrace{\sup_{\theta \in \Theta\ |\ g(\theta) = \gamma } L(\theta; x_1, ..., x_n ) }_{=L^*(\gamma; x_1, ..., x_n)}	
+	\end{align*}
+\end{proof}
+
+\begin{ex}
+	Let $X_1, ..., X_n$ be iid from Bernoulli($p$). If $\hat{p} = \overline{X} = p_{\text{MLE}}$, then $\sqrt{\hat{p}(1-\hat{p})}$ is the MLE of the standard deviation $\sqrt{p(1-p)}$. 
+\end{ex}
+
+The next example will be a nice philosophical example. 
+
+\begin{ex} 
+	Among 20 tosses, assume that there were 7 heads. Suppose that we want to estimate $p$ in two ways: 
+	\begin{itemize}[noitemsep]
+		\item Experiment \# 1: the coin was tossed 20 times and it had 7 heads. However, we don't know \emph{when} those 7 heads happened. In this case, think of likelihood as the probability of observing what you have observed: 
+		\begin{align*}
+			\binom{20}{7} p^7 (1-p)^{13} 	
+		\end{align*}
+		implies that the log likelihood is 
+		\begin{align*}
+			\log \binom{20}{7} + \underbrace{7 \log(p) + 13 \log(1-p)}_{\text{ this is called the \dfn{kernel} of the log-likelihood}}
+		\end{align*}
+		\item Experiment \# 2: suppose you waited until 7 heads were tossed, and you are told it took 20 tosses to get there. Therefore, the difference here is that \emph{you know that the 20th toss was a head}. This probability is modelled by the \dfn{negative binomial}: 
+		 \begin{align*}
+ 			\binom{19}{6} p^7 (1-p)^{13} 
+ 		\end{align*}
+		and so the log likelihood is: 
+		\begin{align*}
+			\log \binom{19}{6} + \underbrace{7 \log (p) + 13 \log (1-p)}_{\text{kernel}}	
+		\end{align*}
+	\end{itemize}	
+	Even though the likelihoods are not the same, the MLE between the two will be the same! We have: 
+	\begin{align}
+		L_1 \propto p^7(1-p)^{13} 
+	\end{align}
+	that is, $L_1(p) = c_1 \cdot p^{7}(1-p)^{13}$. Similarly, $L_2(p)  =c_2 \cdot p^{7}(1-p)^{13} \propto p^7 (1-p)^{13}$. Therefore, the MLE estimates are the same in the two experiments, since $L_1(p) = c L_2(p)$. This is called the \dfn{likelihood principle}: when two likelihood functions of two experiments are equal up to a multiplicative constant, they contain the same information about the unknown parameter.
+\end{ex}
+
+
+\subsubsection{Bayesian Method}
+In the \dfn{Bayesian philosophy}, we quantify the lack of knowledge of a parameter $\theta$ with a probability distribution or density $\pi(\theta)$. This is called a \dfn{prior}. A prior distribution is \emph{your} belief of what the probability is. Once the data has been collected-- say, $x_1, x_2, ..., x_n$, we can update the prior to incorporate this information, and this leads to the \dfn{posterior density}. 
+
+The \dfn{posterior density function} is given by: 
+\begin{align}
+	\pi (\theta\ |\ x_1, ..., x_n ) := \frac{f(\theta, x_1, ..., x_n)}{f(x_1,..., x_n)	} = \frac{f(x_1, ..., x_n; \theta) \pi(\theta)}{\idx{\Theta}{} f(x_1, ..., x_n; \theta) \pi(\theta) d \theta}
+\end{align}
+
+\begin{ex}
+	Consider $X_1, ..., X_n$ taken from a Bernoulli$(p)$ distribution with a prior from the Beta distribution. Recall that the \dfn{beta function} is given by: 
+	\begin{align*}
+		\idx{0}{1} x^{\alpha -1} (1-x)^{\beta -1} dx 	
+	\end{align*}
+	and so the \dfn{beta distribution} B($\alpha$, $\beta$) has the density: 
+	\begin{align}
+		f(x; \alpha, \beta) = x^{\alpha - 1} (1-x)^{(\beta -1)} \cdot \frac{\Gamma (\alpha + \beta)}{\Gamma (\alpha) \Gamma (\beta)} \chi_{x \in ]0,1[}
+	\end{align}
+	The set of beta distributions has a lot of different shapes as you vary the parameters, which makes it a nice distribution to choose priors from. For example, the uniform is a special case of a beta distribution. Given the data $x_1, ..., x_n$, we obtain: 
+	\begin{align*}
+		f(x_1, ..., x_n; p) & = \prod_{i=1}^n p^{x_i}(1-p)^{1-x_i} 	\\
+						    & = p^{n \overline{x}} (1-p)^{n - n \overline{x}} 
+	\end{align*}
+	We thus obtain the posterior: 
+	\begin{align*}
+		\pi (p | x ) & = \frac{p^{n \overline{x}} (1-p)^{n - n \overline{x}}  p^{\alpha -1} (1-p)^{\beta -1 } \frac{\Gamma (\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)}}{\idx{0}{1}p^{n \overline{x}} (1-p)^{n - n \overline{x}}  p^{\alpha -1} (1-p)^{\beta -1 }  \frac{\Gamma (\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} dp }	\\
+			& \propto c (x_1, ..., x_n, \alpha, \beta) p^{n \overline{x} + \alpha - 1} (1-p)^{n - n \overline{x} + \beta -1 } 
+	\end{align*}
+	The posterior is a beta density: 
+	\begin{align*}
+		\pi (p | x_1, ..., x_n) \sim \text{Beta}(n \overline{x} + \alpha, n - n \overline{x} + \beta) 	
+	\end{align*}
+	here, the Beta is the so-called \dfn{conjugate prior}; that means, the posterior belongs to the same class of densities as the prior. Observe that we no longer have a point estimate of $p$; we have a distribution. To obtain a point estimate, we can take the expected value of the density: 
+	\begin{align*}
+		& \hat{p}_B = \text{ expected value of the posterior. } 	\\
+		& \Rightarrow \hat{p}_B := \EX{Y},\ Y \sim \text{Beta}(n \overline{x} + \alpha, n - n \overline{x} + \beta)
+	\end{align*}
+	Note that the expected value of $B(\alpha, \beta)$ is $\frac{\alpha}{\alpha + \beta}$ and: 
+	\begin{align*}
+		\hat{p}_B  = \frac{n\overline{x} + \alpha}{n + \alpha + \beta} = \frac{n}{n + \alpha + \beta} \underbrace{\overline{x}}_{\text{MLE}} + \frac{\alpha + \beta}{n + \alpha + \beta} \underbrace{\frac{\alpha}{\alpha + \beta}}_{\text{ expectation of prior}}	
+	\end{align*}
+	Notice the weights. The more data that you have, the more the weights favour the data. Thus, a small sample means that the prior has a larger effect. 
+\end{ex}
+
+\begin{ex}[Poisson Likelihood Example - Continued]
+	Consider the Poisson$(\lambda)$ model with parameter $\lambda > 0$ and data $x_1, ..., x_n$. In order to go Bayesian, we need to multiply the prior estimate of $\lambda$, and we want it to be a conjugate prior. \emph{What do we multiply it by?} $\pi(\lambda) \sim$ Gamma$(\alpha, \beta)$ works:. We obtain: 
+	\begin{align}
+		f(x_1, ..., x_n; \lambda) \pi(\lambda) = 
+		\frac{1}{\Gamma(\alpha)} \frac{\lambda^{n \overline{x}} e^{-n \lambda}}{x_1! \cdots x_n!} \underbrace{\lambda^{\alpha-1} e^{-\lambda \beta} \beta^\alpha}_{\pi(\lambda) \sim \text{Gamma}(\alpha, \beta)} \propto \alpha \lambda^{\alpha + n \overline{x} - 1} e^{-\lambda (n + \beta)}
+	\end{align}
+	The posterior is again a Gamma, so the Gamma prior is a conjugate prior. Thus: 
+	\begin{align*}
+		\pi(\lambda | x ) \sim \text{Gamma}(\alpha + n \overline{x}, n + \beta) 	
+	\end{align*}
+	which gives: 
+	\begin{align*}
+		\hat{\lambda}_B = \frac{\alpha + n \overline{x}}{n + \beta} = \frac{n}{n+\beta} \overline{x} + \frac{\beta}{n+ \beta} \frac{\alpha}{\beta}	
+	\end{align*}
+	where the final term comes from the fact that the expected value of Gamma$(\alpha, \beta)$ is $\alpha / \beta$. 
+
+\end{ex}
+
+
+\subsection{Method of Evaluating Estimators}
+
+\begin{definition}[Unbiased, Consistent, and MSE] Let $\dist = \{ F_\theta\ |\ \theta \in \Theta \}$ be our statistical model, let $\gamma: \Theta \rightarrow \R^n$, and also let $T(x_1, ..., x_n)$ be an estimator of $\gamma (\theta)$. Then: 
+\begin{enumerate}[noitemsep]
+	\item An estimator $T(X_1, ..., X_n)$ is called \dfn{unbiased} if: 
+	\begin{align}
+		\EXth{\stat} = \gamma(\theta)
+	\end{align}
+	\emph{On average, does it get the right thing?} 
+	\item $T$ is called \dfn{consistent} if 
+	\begin{align}
+		\stat \xrightarrow[]{P} \gamma(\theta) \text{ as } n \rightarrow \infty 
+	\end{align}
+	\emph{Some kind of limiting statement -- generally uses WLLN techniques} 
+	\item The \dfn{mean squared error (MSE)} of $\stat$ is: 
+	\begin{align}
+		\text{MSE}(T):= \EXth{\{ \stat - \gamma(\theta) \}^2}
+	\end{align}
+\end{enumerate}
+\end{definition}
+Before going on, need to make some important remarks: 
+\begin{enumerate}[noitemsep]
+	\item If $X_1$ has an expectation $\mu$ and variance $\sigma^2$, then we already had that the sample mean is an unbiased estimator of $\mu$ and $s^2$ is an unbiased estimator of $\sigma^2$ (Theorem 1.9). 
+	\item Sometimes the consistency as defined here is called \dfn{weak consistency} to differentiate it from \dfn{strong consistency}, which is the case when $\stat \rightarrow \gamma(\theta)$. In general, it is hard to prove strong consistency. It generally requires the use of the strong law of large numbers. 
+	\begin{enumerate}[noitemsep]
+		\item \emph{Caution!}: beware of asymptotics! You can have quite stupid examples. For example, consider N$(\mu, \sigma^2)$. Suppose that we want to estimate $\mu$. We can construct this silly unbiased estimator: 
+		\begin{align*}	
+			& T(X_1, ..., X_n) = X_1 
+		\end{align*}
+		And we can construct this silly consistent estimator: 
+		\begin{align*} 
+		 \stat = \begin{cases}
+				X_1 & \text{ if } n \leq 10^6 \\
+				\overline{X} & \text{ if } n > 10^k
+			\end{cases}	
+		\end{align*}
+	\item (Deriving bias variance decomposition of MSE). Write $T = \stat$. Then, for any $\theta$: 
+		\begin{align*}
+				\text{MSE}(T) &  = \EXth{\stat + \EXth{T} - \EXth{T} + \gamma(\theta) }^2 \\
+					& = \underbrace{\EXth{T - \EXth{T} }^2}_{\text{variance of T}} + \EXth{ \EXth{T} - \gamma(\theta) }^2 
+		\end{align*}
+		$T$ is the only random part. 
+		\begin{align*}
+			& = \text{var}_\theta[T] + (\EXth{T}- \gamma(\theta))^2 + 2(\EXth{T} - \gamma(\theta))\underbrace{\EX{T - \EXth{T}}}_{=0} \\
+			& = \text{var}_\theta[T] + [\EXth{T} - \gamma(\theta)]^2 
+		\end{align*}
+		We call $\EXth{T}-\gamma(\theta)$ the \dfn{bias} of $T$, and so: 
+		\begin{align}
+			\text{MSE}_\theta = \text{var}_\theta[T] + (\text{Bias}_\theta(T))^2 
+		\end{align}
+	\end{enumerate}
+\end{enumerate}
+
+\begin{ex} 
+	Let $X_1, ..., X_n$ be a random sample from $N(\mu, \sigma^2)$. Then: 
+	\begin{align*}
+		\text{MSE}(\overline{X}) = \text{var}_\theta[\overline{X}] = \sigma^2 / n 	
+	\end{align*}
+	this converges to zero as $ n \rightarrow \infty$. Moreover: 
+	\begin{align*}
+		\text{MSE}[s^2] = \text{var}[s^2] = \text{var}\left[ \underbrace{ \frac{n-1}{\sigma^2} s^2}_{\sim \chi_{n-1}^2} \cdot \frac{\sigma^2}{(n-1)}	\right] 	= \frac{\sigma^4}{(n-1)^2} \underbrace{2(n-1)}_{\text{variance of } \chi_{(n-1)}^2} = \frac{2\sigma^4}{(n-1)}
+	\end{align*}
+	This converges at the same rate as the sample mean. Recall the MLE of $\sigma^2$: 
+	\begin{align*}
+		\hat{\sigma}^2 = \frac{(n-1)}{n} s^2	
+	\end{align*}
+	and so the bias is: 
+	\begin{align*}
+		\text{Bias}(\hat{\sigma}^2) & = \EX{\frac{n-1}{n	} s^2}  - \sigma^2 \\
+			 & = \frac{n-1}{n} \sigma^2 - \sigma^2 \\
+			 & = \frac{-\sigma}{n} 	
+	\end{align*}
+	Thus, the bias is always negative and so it will systematically underestimate $\sigma^2$. Thus, the MSE($\hat{\sigma}^2$) is: 
+	\begin{align*}
+		\text{MSE}(\hat{\sigma}^2) & =  \EX{(\hat{\sigma}^2 - \hat{\sigma})^2}  	\\
+		 & = \text{var}[\hat{\sigma}^2] + [\text{Bias}(\hat{\sigma}^2)]^2 \\
+		 & = \left( \frac{n-1}{n} \right)^2 \text{var}[s^2] + \frac{\sigma^4}{n^2} \\
+		 & = \frac{(n-1)^2}{n^2} \frac{2 \sigma^4}{(n-1)} + \frac{\sigma^4}{n^2} \\
+		 & = \frac{\sigma^4(2(n-1)+1}{n^4} \\
+		 & = \frac{\sigma^4}{n^2} (2n-1) \\
+		 & = \frac{2 \sigma^4}{n-1} \cdot \underbrace{\frac{2n^2 - 3n +1}{2n^2}}_{< 1} \\
+		 & < \frac{2 \sigma^4}{n-1}
+	\end{align*}
+	So, $\hat{\sigma}^2$ is closer, on average, to the true value of $\theta$ than $s^2$ is. Thus, the MLE is preferable. This illustrates the idea of a tradeoff between bias and variability. 
+\end{ex}
+
+To do: insert figure
+
+\begin{ex}
+	Let $X_1, ..., X_n$ be taken from Bernoulli$(p)$. Recall that $\hat{p}_{\text{MLE}} = \overline{x}$ and MSE($\hat{p}_{\text{MLE}}) = \frac{p(1-p)}{n}$. In contrast, a Bayesian estimator with a Beta$(\alpha, \beta)$ prior, we have: 
+	\begin{align*}
+		\hat{p}_B = \frac{n}{n + \alpha + \beta} \overline{x} + \frac{\alpha}{n+ \alpha + \beta}	 = \frac{n \overline{x} - \alpha}{n + \alpha + \beta}	
+	\end{align*}
+	Calculating the MSE gives: 
+	\begin{align*}
+		\text{MSE}(\hat{p}_B) & = \text{var} \left[ 	\frac{n \overline{x} - \alpha}{n + \alpha + \beta}		\right] + \left( \text{Bias} \left[ \frac{n \overline{x} - \alpha}{n + \alpha + \beta}	 \right]  \right)^2 \\
+		& = \underbrace{\frac{np(1-p)}{(n+ \alpha + \beta)^2}}_{\text{variance}} + \left( 	\frac{np + \alpha}{n + \alpha + \beta} - p	\right)^2 \\
+		& = \frac{np(1-p)}{(n + \alpha + \beta)^2} + \frac{(\alpha - p \alpha - p \beta)^2}{(n + \alpha + \beta)^2}
+	\end{align*}
+	To compare, we need to choose $\alpha$ and $\beta$ to be independent of $p$. 
+	\begin{align*}
+		\text{MSE}(\hat{p}_B) = ... = \frac{\alpha^ 2 + p(n - 2 \alpha^2 - 2 \alpha \beta) + p^2(-n + \alpha^2 + \beta^2 + 2 \alpha \beta)}{(n+ \alpha + \beta)^2}
+	\end{align*}
+	Thus, if we want the above equation to be independent of $p$, set the coefficients of $p$ and $p^2$ to equal zero. We thus must solve: 
+	\begin{align*}
+			& n - 2 \alpha^2 - 2 \alpha \beta = 0 \\
+			& -n + \alpha^2 + \beta^2 + 2 \alpha \beta = 0
+	\end{align*}
+	which gives: 
+	\begin{align*}
+		& \alpha = \sqrt{\frac{n}{4}} & \beta = \sqrt{\frac{n}{4}}
+	\end{align*}
+	and therefore: 
+	\begin{align*}
+		& \text{MSE}(\hat{p}_B) = \frac{n}{4(n+ \sqrt{n})^2 }	& \hat{p}_B = \frac{n \overline{x} + \sqrt{n / 4}}{n + \sqrt{n}}
+	\end{align*}
+	To do: include figures. 
+	Thus, for small sample sizes, $\text{MSE}(\hat{p}_B )<< $ MLE$(\hat{p}_{\text{MLE}})$. The advantage shrinks as sample size increases. 
+\end{ex}
+
+\begin{theorem}
+	Suppose $\EXth{\stat} \rightarrow \gamma(\theta)$ as $n \rightarrow \infty$ (that is, $\stat$ is asymptotically unbiased) and var$_\theta[T] \rightarrow 0$ as $n \rightarrow \infty$. Then, $T$ is a consistent estimator or $\gamma(\theta)$. 
+\end{theorem}
+
+\begin{proof} Application of the Markov Inequality. Fix $\varepsilon > 0$. Then: 
+\begin{align*}
+	\pr{ | \stat - \gamma(\theta) | > \varepsilon} \leq \frac{\EX{ (\stat - \gamma(\theta))^2}}{\varepsilon^2} = \frac{\text{var}_\theta [T] - (\text{Bias}_\theta[T])^2}{\varepsilon^2}	 \rightarrow 0 \text{ as } n \rightarrow 0 
+\end{align*}
+	
+\end{proof}
+
+\textbf{Q:} \emph{Does there exist a strategy of choosing the best estimator?} \textbf{A:} No! Consider the other ``stupid'' estimator: Suppose we want to estimate $\theta$ and 17 $\in \Theta$. Then the statistic: 
+\begin{align*}
+	\stat = 17	
+\end{align*}
+will always have
+\begin{align*}
+\text{MSE}_{17}(T) = 0 	
+\end{align*}
+
+ You can never beat that silly statistic. More generally, you can never \emph{systematically} minimise the MSE uniformly over all values of $\theta$. Thus, we need to restrict the class of estimators that we consider, which leads us to the next section. 
+
+\subsection{Best Unbiased Estimators}
+
+
+\begin{definition}[Uniform Minimum Variance Unbiased Estimator]
+	An estimator $T^*(X_1, ..., X_n)$ is called a \dfn{uniform} \dfn{minimum} \dfn{variance} \dfn{unbiased} \dfn{estimator} (UMVUE) of $\gamma(\theta)$ if 
+	\begin{enumerate}[noitemsep]
+		\item For \emph{all} $\theta \in \Theta$, $\EXth{T^*} = \gamma (\theta)$. It must be unbiased for \emph{every} $\theta$. 
+		\item For every other unbiased estimator $T$: 
+		\begin{align*}
+			\text{var}_\theta [ T^*] \leq \text{var}_\theta [T]	
+		\end{align*}
+		\emph{for all} $\theta \in \Theta$. It beats it for \emph{any} $\theta$ $\Rightarrow$ uniform control. 
+	\end{enumerate}
+\end{definition}
+This is an estimator that systematically reduces the bias. 
+
+
+\begin{ex} 
+Assume that we have a random variable distributed as Poisson. Then, $\hat{\lambda} = \overline{x}$. Forget about trying to do a Bayesian estimate on this. However, for the variance we have: 
+	\begin{align*}
+		\text{Var}[\hat{\lambda}] = \lambda / n 
+	\end{align*}
+	This seems like it could be a sensible estimator. \textbf{Q:} \emph{Is it the UMVUE}? This question motivates the following theorem: 
+\end{ex}
+
+\begin{theorem}[Crammer-Rao Inequality]
+	Suppose $X_1, ..., X_n$ form a random sample. Let $F_\theta, \theta \in \Theta, \Theta = ]a,b[$ where $-\infty \leq a < b \leq \infty$ form the statistical model. Let $T(X_1, ..., X_n)$ be an \emph{unbiased} estimator of $\gamma(\theta)$. Assume: 
+	\begin{enumerate}[noitemsep]
+		\item $\forall\ \theta \in \Theta$, $F_\theta$ has a density/PMF $f(\cdot; \theta)$, and $\partial f(x; \theta) / \partial \theta$ exists for all $\theta \in \Theta$. 
+		\item You can differentiate the log: 
+		\begin{align*}
+			\EXth{\frac{\partial}{\partial \theta} \log f(x; \theta)} = 0\ \forall \theta \in \Theta 	
+		\end{align*}
+		and 
+		\begin{align*}
+			\EXth{ \left(  \frac{\partial}{\partial \theta} \log f(x; \theta) \right)^2 } = I(\theta) < \infty 	
+		\end{align*}
+		\underline{Remark} the $I(\theta)$ is called the \dfn{Fisher information}
+		\item var$_\theta[T] < \infty$ and: 
+		\begin{align*}
+			\sum_{i=1}^n \EXth{T(X_1, ..., X_n) \frac{\partial}{\partial \theta} \log f(X_i; \theta)} = \gamma'(\theta)  
+		\end{align*}
+		then: 
+		\begin{align*}	
+			\text{var}_\theta T(X_1, ..., X_n) \geq \frac{\{ \gamma'(\theta) \}^2}{nI(\theta)}	
+		\end{align*}
+		\emph{Remark}: this is called the \dfn{Crammer-Rao lower bound} 
+	\end{enumerate}
+\end{theorem}
+
+	\begin{proof}
+		The theorem follows from the Cauchy - Schwartz inequality. Recall from probability: 
+		\begin{align*}
+			\{ \text{cov}(W, Z) \}^2 \leq \text{var}[W] \text{var} [Z] 	
+		\end{align*}
+	We need to choose our quantities for Cauchy-Schwartz inequality: 
+	\begin{enumerate}[noitemsep]
+		\item $\text{var}[W]$ is: 
+		\begin{align*}
+				\text{var}[W] = \sum_{i=1}^n \text{var} \left[ 	\frac{\partial}{\partial \theta}	 \log f(x_i; \theta) \right] = nI(\theta) < \infty \text{ (by assumption 2) } 
+		\end{align*}
+		\item By assumption 3: 
+		\begin{align*}
+			\text{var}_\theta T < \infty 	
+		\end{align*}
+		\item Covariance: 
+		\begin{align*}
+			\text{cov}_\theta [W,Z] = \EXth{W \cdot Z} = \EXth{\sum_{i=1}^n T \frac{\partial}{\partial \theta} \log f(x_i; \theta)}  = \sum_{i=1}^n \EXth{T} \cdot \frac{\partial}{\partial \theta} \log f(x_i; \theta) = \gamma' (\theta) \text{ (assumption 3) }  	
+		\end{align*}
+	\end{enumerate}
+	Now it follows from Cauchy Schwartz: 
+	\begin{align*}
+		[ \gamma'(\theta) ]^2 \leq nI(\theta) \cdot \text{var}_\theta T 	
+	\end{align*}
+	which happens $\iff$:
+	\begin{align*}
+		\text{var}_\theta [T] \geq \frac{\{ \gamma'(\theta) \}^2}{nI(\theta)}	
+	\end{align*}
+	Which is what we wanted to show. 
+	\end{proof}
+Some remarks from the proof: 
+\begin{enumerate}[noitemsep]
+	\item There are a lot of versions of the Crammer-Rao inequality. 
+	\begin{enumerate}[noitemsep]
+		\item This version has the cleanest possible assumptions. 
+		\item We did not need to differentiate between the continuous and discrete cases. 
+	\end{enumerate}
+	\item Observe the set $\{ x\ |\ f(x; \theta) > 0 \}$. We define $N_\theta$ as the set such that $\pr{ x \in \{ x\ |\ f(x; \theta) > 0 \}} = 1$. On here, $X \sim F_\theta$. So, you can restrict your attention to this set which makes the log well-defined. Thus, on $N_\theta$, $\partial / \partial \theta \log f(x, \theta)$ exists. 
+	\item \textbf{Q:} \emph{ What do assumptions (ii) and (iii) mean? } 
+	\begin{enumerate}[noitemsep]
+		\item This means nothing more than interchanging differentiation and integration. In particular, if $\{ x\ |\ f(x; \theta) > 0 \}$ does NOT depend on $\theta$, then, assuming that the $X's$ have a density, then these assumptions amount to interchanging differentiation and integration. 
+		\item From Assumption 2, we have: 
+		\begin{align*}
+			\idx{\R}{} f(x; \theta)dx = 1 	
+		\end{align*}
+		and so differentiating both sides with respect to $\theta$ gives
+		\begin{align*}
+			\idx{\R}{} f(x; \theta) dx = 0 	
+		\end{align*}
+		multiplying and dividing by $f$ gives: 
+		\begin{align*}
+			\idx{\R}{} \left[ \frac{\partial}{\partial \theta} \log f(x;  \theta) 	 	\right] 	= 0 
+		\end{align*}
+			so, assumption 2.1 is saying that you can interchange the derivatives and integrals. 
+	\end{enumerate}
+\end{enumerate}	
+
+Also, 
+\begin{align*}
+	\gamma ( \theta ) = \EXth{T} = \idx{}{} \cdots \idx{}{} T(x_1, ..., x_n) \sum_{i=1}^n \frac{\partial}{\partial \theta} f(x_i; \theta) \prod_{i=1}^n f(x_i; \theta) dx_1 \cdots d x_n 	
+\end{align*}
+We will play the same game again: differentiating and swapping derivatives and integrals gives us: 
+\begin{align*}
+		\gamma' ( \theta ) & =  \idx{}{} \cdots \idx{}{} T(x_1, ..., x_n) \sum_{i=1}^n \frac{\partial}{\partial \theta} f(x_i; \theta) \prod_{j \neq i}^n f(x_i; \theta) dx_1 \cdots d x_n	
+\end{align*}
+artificially multiplying and dividing by $f(x_i; \theta)$ gives: 
+\begin{align*}
+	& = \idx{}{} \cdots \idx{}{} T(x_1, ..., x_n ) \sum_{i=1}^n \underbrace{\frac{\partial}{\partial \theta} \frac{ f(x_i; \theta) 	}{f(x_i; \theta)}}_{\frac{\partial}{\partial \theta} \log f(x_i; \theta)} \prod_{j=1}^n \underbrace{f(x_j; \theta)}_{\text{ expected value}} \\
+	& = \sum_{i=1}^n \EXth{T(x_1, ..., x_n) \frac{\partial}{\partial \theta} \log f(x_i; \theta) } 
+\end{align*}
+These are actually smoothness conditions. There is also a nice geometric interpretation. 
+
+\subsubsection{Geometric Interpretation}
+Define the following space: 
+\begin{align*} 
+	\mathcal{L}_2 := \{ g: \R^n \rightarrow \R, \text{ borel measurable }, \EXth{g^2(x_1,..., x_n)} < \infty  \} 
+\end{align*}
+On $\Ltwo$ space, we can define a scalar product: $g_1, g_2 \in \Ltwo$, then: 
+\begin{align*}
+	\langle g_1, g_2 \rangle = \EXth{g_1(x_1, ..., x_n) \cdot g_2 (x_1, ..., x_n) }	
+\end{align*}
+On $\Ltwo$, the norm for $g \in \Ltwo$
+\begin{align*}
+		||g||^2 = \langle g, g \rangle = \EXth{g^2} < \infty 
+\end{align*}
+$\Ltwo$ is a Hilbert space. In particular, it is a space of equivalence classes of functions. In this case: 
+\begin{align*}
+	g_1 \sim g_2 \text{ if } \mathbb{P}_\theta [ g_1(x_1, ..., x_n) = g_2(x_1,..., x_n)] = 1	
+\end{align*}
+We can consider projections since $\Ltwo$ is a Hilbert space. Let $T$ be an unbiased estimator of $\gamma (\theta)$. Then, $T \in \Ltwo$.  Define $\overline{T}:= T - \gamma(\theta)$. Then, $\overline{T} \in \Ltwo$ and $\langle \overline{T}, 1 \rangle =0$ (since it's unbiased), since $\langle \overline{T}, 1 \rangle = \EXth{T - \gamma(\theta)}$. Thus, $\overline{T}$ is orthogonal to the subspace of constant functions. Define the following function: 
+\begin{align}
+	k(x_1, ..., x_n) := \sum_{i=1}^n \frac{\partial}{\partial \theta} \log f(x_i; \theta) 
+\end{align}
+From assumption (ii) of the Crammer-Rao inequality, $||k||^2 = nI(\theta) \in ]0, \infty[$ which implies that $k \in \Ltwo$. Since the expected value again is zero, we have that $\langle k, 1 \rangle = 0$. Moreover, from assumption (iii) of the Crammer-Rao inequality:
+\begin{align*}
+	\langle k, T \rangle = \gamma ' (\theta) = \langle k, \overline{T} \rangle 	
+\end{align*}
+Therefore, we can re-frame the assumptions of the Crammer-Rao inequality in terms of assumptions on the norms and scalar products.  Now define $V:= $ span$(k) = \{ c \cdot  k\ |\ c \in \R \} $ and project $\overline{T}$ onto $V$. Then: 
+\begin{align*}
+	\mathbf{T}_V \overline{T} = \left\langle \overline{T}, \frac{k}{|| k||} \right\rangle \frac{k}{|| k ||}	 =  \left\langle \overline{T}, k \right\rangle \frac{k}{|| k ||^2} = \frac{\gamma ' (\theta) k}{n I(\theta)}
+\end{align*}
+Now, by the pythagorean theorem: 
+\begin{align*}
+	\underbrace{|| \overline{T} ||^2}_{\text{variance}}= || \mathcal{T}_V \overline{T} ||^2 + || \overline{T} - \mathcal{T}_V \overline{T} ||^2	
+\end{align*}
+However, this is precisely the inequality: 
+\begin{align*}
+	\text{var}_\theta [T] & = \frac{\{ \gamma'(\theta) \}^2}{n I (\theta)} + \underbrace{|| T - \mathcal{T}_V \overline{T} ||^2 }_{\geq 0} \\
+	& \geq \frac{\{ \gamma' (\theta) \}^2}{n I(\theta)}
+\end{align*}
+equality holds \emph{only} when $\overline{T} \in V$. So, the UMVUE must be in $V$. That is: 
+\begin{align*}	
+	T - \gamma (\theta)  = ck = a (\theta) k 	
+\end{align*}
+where $a(\theta)$ is a constant that depends on $\theta$. So, the UMVUE is of the form: 
+\begin{align}
+	T = a(\theta) k(x_1, ..., x_n) + \gamma (\theta ) 
+\end{align}
+We will see later that the only estimators of this form are members of the exponential family. 
+
+\begin{ex}
+	Consider the Poisson family. 
+	\begin{align*}
+		\{ \text{Poi}(\lambda), \lambda > 0 \} 
+	\end{align*}
+	then, the densities are given by: 
+	\begin{align*}
+		f(x; \lambda) = e^\lambda \frac{\lambda^x}{x!} \chi_{x \in N_\lambda} 	
+	\end{align*}
+	Again, we don't need to worry about the bad points. In this case, $N_\lambda = \mathbb{N}_0$, and so we can differentiate the density with respect to $\lambda$ and so we have no problems. We will now check the conditions of the Crammer-Rao inequality: 
+	\begin{align*}
+		\frac{\partial}{\partial \lambda} \log f(x, \lambda) = \frac{\partial}{\partial \lambda} \left[ 	-\lambda + x \log (\lambda) - \log x!		\right] 	 = -1 + \frac{x}{\lambda}
+	\end{align*}
+	and so the first condition is met. Now for the second assumption: 
+	\begin{align*}
+		\mathbb{E}_\lambda \left[ 	\frac{\partial}{\partial \lambda} \log f(x; \lambda) 	\right] \underbrace{=}_{x \sim \text{Pos}(\lambda)} \mathbb{E}_\lambda \left[ 	-1 + \frac{x}{\lambda}		\right]
+	\end{align*}
+	and for the variance
+	\begin{align*}
+		\text{var} \left[ \frac{\partial}{\partial \lambda } \log f(x; \lambda) \right] 	 = \mathbb{E}_\lambda \left[ 	\left( 	\frac{\partial}{\partial \lambda}	 \log f(x; \lambda) \right)^2		\right] = \text{var}_\lambda \left[ -1 + \frac{x}{\lambda} \right] = \frac{1}{\lambda^2} \text{var}_\lambda[x] = \frac{1}{\lambda} = I(\lambda) 
+	\end{align*}
+	so, by the Crammer-Rao inequality, the Crammer-Rao bound is: 
+	\begin{align*}
+		\frac{1}{I(\lambda) \cdot n} = \frac{\lambda}{n}	
+	\end{align*}
+	So, if $T^*(x_1, ..., x_n)  = \overline{x}$, then $\EX{T^*} = \lambda$ and var$[T^*] = \lambda / n$. So, the sample mean attains the Crammer-Rao upper bound. Is $\overline{x}$ the UMVUE, or is there something else to check? We need to check (iii). If $T$ is unbiased for $\lambda$, and var$_\lambda [T]< \infty$, can we have the validity of (iii)? 
+	\begin{align*}
+		1 = \sum_{i=1}^n \EXth{T} \frac{\partial}{\partial \lambda} \log f(x_i; \lambda) 	
+	\end{align*}
+	This comes down to interchanging summation and differentiation. We know that $T$ is unbiased: 
+	\begin{align*}
+		\lambda = \EXth{T} = \sum_{x_1 = 0 }^\infty \cdots \sum_{x_n = 0}^\infty T(x_1, ..., x_n) e^{-\lambda}	\frac{\lambda^{\sum x_i}}{\prod_{i=1}^n x_i !} 
+	\end{align*}
+	Trick: move the $e^{-n \lambda}$ out: 
+	\begin{align*}
+		= e^{- n \lambda} \sum_{k=1}^\infty \underbrace{ \left( 	\sum_{(x_1, ..., x_n) \in \mathbb{N}_0^n\ |\ \sum_{i=1}^n x_i = k } T(x_1, ..., x_n) \frac{1}{\prod_{i=1}^n} x_i!	\right) }_{:= a_k}	\lambda^k
+	\end{align*}
+	This is an absolutely convergent power series. The variance is finite. In the radius of convergence, we can interchange summation and differentiation: 
+	\begin{align*}
+		1 = \sum_{k=0}^\infty \frac{\partial }{\partial \lambda}	 \left[ e^{-n \lambda} a_k \lambda^k \right] 
+	\end{align*}
+	You can deduce that (iii) holds. So, Crammer-Rao is applicable and 
+	\begin{align*}
+		\text{var}_\theta [T] \geq \frac{\lambda}{n} = \text{var}_\lambda T^*	
+	\end{align*}
+	and so the sample mean is the UMVUE: $T^* = \overline{x}$ 
+\end{ex}
+
+\begin{ex} 
+	Consider the so-called \dfn{one-parameter exponential family}. This is an umbrella term for the following families of distributions with distribution functions of the form: 
+	\begin{align*}
+		f(x;	\lambda) = \chi_{x \in A} \cdot \text{exp} \left\{ c(\theta) \cdot T(x) + d(\theta) + s(x) \right\} 
+	\end{align*}
+	important: the support of the characteristic function does NOT depend on $\theta$! For example, the PMF of the Poisson$(\lambda)$ is: 
+	\begin{align*}
+		f(x; \lambda ) = \chi_{ x \in \mathbb{N}_0 } \text{exp} \{ - \lambda + x \log (\lambda) - \log (x!) \} 	
+	\end{align*}
+	here, 
+	\begin{align*}
+		& c(\lambda) = \text{log}(\lambda) \\
+		& d(\lambda) = - \lambda \\
+		& T(x) = x \\
+		& s(x) = - \log (x!) 	
+	\end{align*}
+	Or, the PDF of N$(\mu, \sigma^2)$ with KNOWN $\sigma^2$ is:
+	\begin{align*}
+		f(x, \mu) = \frac{1}{\sqrt{2 \pi \sigma^2}}	\text{exp} \cdot \left\{ 	\frac{x \mu}{\sigma^2} - \frac{-\mu^2}{2 \sigma^2} - \frac{x^2}{2 \sigma^2} - \frac{1}{2} \log(2 \pi \sigma^2) 	\right\} 
+	\end{align*}
+	can be written as: 
+	\begin{align*}	
+		= \chi_{x \in \R} 	\text{exp} \cdot \left\{ 	\frac{x \mu}{\sigma^2} - \frac{-\mu^2}{2 \sigma^2} - \frac{x^2}{2 \sigma^2} - \frac{1}{2} \log(2 \pi \sigma^2) 	\right\} 
+	\end{align*}
+	Which means that it is in the one parameter exponential from the set:
+	\begin{align*} 
+			& c(\mu) = \frac{\mu}{\sigma^2} \\
+			& d(\mu) = \frac{-\mu^2}{2 \sigma^2} \\
+			& T(x) = x \\
+			& S(x) = \frac{-x^2}{2 \sigma^2} - \frac{1}{2} \log (2 \pi \sigma^2) 
+	\end{align*}
+\end{ex}
+
+However, \emph{if} $\Theta = ]a, b[$, $-\infty \leq a < b \leq \infty$, and $c$ is continuously differentiable with derivative $c'(\theta) > 0$ for all $\theta \in \Theta$ (this is the regularity condition), then for any unbiased estimator $T^*$ for which the assumptions of the Crammer-Rao inequality are met (i.e., we can swap differentiation and integration), we have that the only densities for which the Crammer-Rao inequality is attained is if the density belongs to an exponential family. 
+
+If $\EX{T(x)} = \theta$, then: 
+\begin{align*}
+	I(\theta) = \frac{1}{\text{var}[T(x)]}	
+\end{align*}
+and
+\begin{align*}
+	\frac{1}{n} \sum_{i=1}^n T(x_i) 	
+\end{align*}
+is the UMVUE. 
+
+
+\begin{ex} 
+	$c(\theta)T(x) + d(\theta) + s(x) (:= (*)) $ Then: 
+	\begin{align*}
+		f(x; \theta) = \chi_{x \in A} e^{(*)} 	
+	\end{align*}
+	Then, the one-parameter exponential family is: 
+	\begin{align*}
+		\theta \in \Theta, \text{ where } \Theta \in ]a,b[ 	
+	\end{align*}
+	These are the kind of distributions for which the theory works nicely. Moreover: 
+	\begin{enumerate}[noitemsep]
+		\item If $c$ is continuously differentiable on $\Theta$, and $c' > 0$, and $w(x_1, ..., x_n)$ is an estimator with finite variance and unbiased, then the assumptions of the Crammer-Rao theorem holds. 
+		\item If $\EXth{T(x)} = \theta$, then $I(\theta) = \frac{1}{\text{var}_\theta T(x)}$ and $\frac{1}{n} \sum_{i=1}^n T(x_i)$ is the UMVUE of $\theta$. 
+	\end{enumerate}
+	Interestingly, if $n=1$, we know that the estimator that attains the Crammer-Rao lower bound must have the form: 
+	\begin{align*}
+		T(x) = a (\theta) \frac{\partial}{\partial \theta} \log f(x; \theta) + \theta 	
+	\end{align*}
+	for $x$ fixed, $\frac{\partial}{\partial \theta} \log f(x; \theta) = \frac{T(x) - \theta}{a(\theta)} = c'(\theta)T(x) + d'(\theta)$, which implies that $\log f(x; \theta) = c(\theta)T(x) + d(\theta) + s(x)$. 
+	
+	Other examples of one-parameter exponential families with $T(x) = x$ are Poisson$(\lambda)$ or $N(\mu, \sigma^2)$ with \emph{known} $\sigma^2$. In this case, $\overline{x}$ is the UMVUE for $\lambda, \mu$ respectively. 
+\end{ex}
+
+\begin{lemma}
+	If $f(x; \theta)$ is a PDF/PMF so that $f$ is differentiable with respect to $\theta$ $\forall \theta$, $x \in N_\theta$, and so that for $X$ with a PDF/PMF $f(x; \theta)$: 
+	\begin{enumerate}[noitemsep]
+		\item $\EXth{\frac{\partial}{\partial \theta} \text{log}f(x; \theta)} =0$ and 
+		\item $\frac{\partial}{\partial \theta} \EXth{\frac{\partial}{\partial \theta} \text{log}f(x; \theta) } = 0 = $ 
+		\begin{align*}
+			\begin{cases}
+				& \idx{}{} \frac{\partial}{\partial \theta} \left( \left[  \frac{\partial}{\partial \theta} \log f(x; \theta)   \right]	f(x; \theta) 	\right) dx \\
+				& \sum_{x} \frac{\partial}{\partial \theta} \left[ \frac{\partial}{\partial \theta} \log f(x; \theta) \right] 
+			\end{cases}	
+		\end{align*}
+			depending on if $x$ is discrete or continuous, then: 
+			\begin{align*}
+				I(\theta) = \EXth{\frac{\partial}{\partial \theta} \log f(x; \theta)}^2	= - \EXth{\frac{\partial^2}{\partial \theta} \log f(x; \theta)}
+			\end{align*}
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	We will only prove this in the case that $X$ is continuous. All this is doing is carrying out differentiation. The LHS is zero. The RHS is: 
+	\begin{align*}
+		& \idx{}{} \frac{\partial}{\partial \theta} \left( 	\frac{\partial / \partial \theta f(x; \theta) }{f(x; \theta)}		\right) dx  	\\
+		& = \idx{}{} \left[ 	\frac{\partial^2}{\partial^2 \theta}	 \log f(x; \theta)	\right] \cdot f(x; \theta) dx + \idx{}{}  \left( \frac{\partial}{\partial \theta} \log f(x; \theta) \right) \frac{\partial}{\partial \theta} f(x; \theta) dx 
+	\end{align*}
+	Observe that the $f(x; \theta)$ term is simply: 
+	\begin{align*}
+		& = \frac{\partial / \partial \theta f(x; \theta)}{f(x; \theta)} \cdot f(x; \theta) \\
+		& = \frac{\partial}{\partial \theta} \log f(x; \theta) f(x; \theta) 
+	\end{align*}
+	which implies that: 
+	\begin{align*}
+		0 = \EXth{\frac{\partial^2}{\partial^2 \theta} \log f(x; \theta)} + \EXth{\frac{\partial}{\partial \theta} \log f(x; \theta)}^2 
+	\end{align*}
+	which proves what we wanted to show. 
+\end{proof}
+The next example highlights the limitations of the result: 
+
+\begin{ex} 
+	Let's consider $N(\mu, \sigma^2)$ with $\mu$ known. Suppose that we want to estimate $\sigma^2$. Then: 
+	\begin{align*}
+		\log f(x; \mu, \sigma^2) = - \frac{1}{2}	 \log (2 \pi) - \frac{1}{2} \log (\sigma^2) - \frac{1}{2} \frac{(x-\mu)^2}{\sigma^2}
+	\end{align*}
+	This is a one-parameter exponential family. The assumptions of CR hold here (can be checked). To calculate the CR lower bound, we need to calculate $I(\sigma^2)$: 
+	\begin{align*}
+			\frac{\partial}{\partial^2 \sigma^2} \log f(\mu, \sigma^2) = - \frac{1}{2} \frac{1}{\sigma^2} - \frac{1}{2} \frac{(x-\mu)^2}{\sigma^4}
+	\end{align*}
+	and
+	\begin{align*}
+		\EX{- \frac{1}{2} \frac{1}{\sigma^2} - \frac{1}{2} \frac{(x-\mu)^2}{\sigma^4}} = -\frac{1}{2} \frac{1}{\sigma^2} - \frac{1}{2} \frac{1}{\sigma^4} \sigma^2 = 0 
+	\end{align*}
+	By the Lemma: 
+	\begin{align*}
+		\frac{\partial}{\partial^2 \sigma^2}	 \log f(x; \mu, \sigma^2) = \frac{1}{2} \frac{1}{\sigma^4} + \frac{1}{2} (x-\mu)^2(-2)\frac{1}{\sigma^6}	
+	\end{align*}
+	and so
+	\begin{align*}
+		\EX{\frac{\partial}{\partial^2 \sigma^2}	 \log f(x; \mu, \sigma^2)} & = \frac{1}{2} \frac{1}{\sigma^4} - \frac{1}{\sigma^6} \EX{x-\mu}^2 \\
+			& = \frac{1}{2 \sigma^4} - \frac{1}{\sigma^4} \\
+			& = -\frac{1}{2}\frac{1}{\sigma^4}
+	\end{align*}
+	So: 
+	\begin{align*}
+		I(\sigma^2) = \frac{1}{2} \frac{1}{\sigma^4}
+	\end{align*}
+	So, the Crammer-Rao lower bound  for $\sigma^2$ is: 
+	\begin{align*}
+		\frac{2 \sigma^4}{n}
+	\end{align*}
+	\textbf{Q:} \emph{Can we find an unbiased estimator with this variance}? For the sample variance: 
+	\begin{align*}
+		\EX{s^2} = \sigma^2 	
+	\end{align*}
+	but
+	\begin{align*}
+		\text{var}[s^2] = \frac{2 \sigma^4}{(n-1)}
+	\end{align*}
+	where the variance was computed in Example 2.16. So, we have
+	\begin{align*}
+			\text{var}[s^2] > \frac{2\sigma^2}{n}
+	\end{align*}
+	:-(. AN UMVUE would be:
+	\begin{align*}
+			\frac{1}{n} \sum_{i=1}^n (x_i - \mu)^2 
+	\end{align*}
+	but this requires that we KNOW $\mu$. Note that
+	\begin{align*}
+	\sum_{i=1}^n \frac{(x_i- \mu)^2}{\sigma^2} \sim \chi_n^2
+	\end{align*}
+	But, if $\mu$ is unknown, then the above is not an estimator, since there is dependence on a parameter, and thus the CR lower bound cannot be attained. This shows a limitation of the CR method. 
+\end{ex}
+
+\begin{ex} 
+	Observe that the CR lower bound is: 
+	\begin{align*}
+		\frac{1}{nI(\theta)}
+	\end{align*}
+	if we want to estimate $\theta$, and if CR is applicable, then: 
+	\begin{align*}
+		\text{Var}_\theta T \geq \frac{1}{nI(\theta)}
+	\end{align*}	
+	which means that the maximum speed at which you could get var$[T]$ to go to zero is $1/n$. This means it's at best $O(1/n)$. Now consider the uniform model $U[0, \theta]$, $\theta > 0$. Then: 
+	\begin{align*}
+		f(x; \theta) = \frac{1}{\theta} \chi_{x \in ]0, \theta[} 
+	\end{align*}
+	We already have: 
+	\begin{align*}
+			& \hat{\theta}_{\text{MOM}} = 2 \overline{x} \\
+			& \hat{\theta}_{\text{MLE}} \max \{ x_1, ..., x_n \} 
+	\end{align*}
+	Here, $\hat{\theta}_{\text{MOM}}$ is unbiased and var$[\hat{\theta}_{\text{MOM}}] = \frac{4 \text{var}[x]}{n}$. The rate, $4/n$, is what's interesting. If $X_{(n)} = \max \{ X_1, ..., X_n \}$, then: 
+	\begin{align*}
+			f_{X_{(n)}}(x; \theta) = \frac{n}{\theta} x^{n-1} 
+	\end{align*}
+	and so 
+	\begin{align*}
+			\EX{X_{(n)}} = \idx{0}{\theta} \frac{x^n}{\theta^n} n dx = \theta \frac{n}{n+1}
+	\end{align*}
+	which means that the MLE is not unbiased. So, to make it unbiased, set: 
+	\begin{align*}
+			\widetilde{\theta} := \hat{\theta}_{\text{MLE}} \frac{(n+1)}{n}
+	\end{align*}
+	which means that 
+	\begin{align*}
+		\text{var}[\theta] = \left[ 	 \frac{(n+1)}{n}	 \right]^2 \idx{0}{\theta} \left[ x - \frac{\theta n}{n+1}	\right]^2 \frac{nx^{n-1}}{\theta^n} dx   = \cdots = \frac{\theta^2}{n(n+2)} << \frac{1}{nI(\theta)} = \frac{\theta^2}{n}
+	\end{align*}
+	Something is wrong. Let's check the conditions of the CR. Set $N_\theta := ]0, \theta[$. Then, $\partial / \partial \theta \log f(x; \theta)$ on $]0, \theta[$ is: 
+	\begin{align*}
+		& \frac{\partial}{\partial \theta} \left( 	\frac{1}{\theta}	\right) = - \frac{1}{\theta^2} \\
+		& \frac{\partial}{\partial \theta} \log f(x; \theta) = - \frac{1}{\theta} \\
+		& I(\theta) = \EX{ \left( 	\frac{\partial}{\partial \theta} \log f(x; \theta)	 \right)^2  } = \EX{\frac{1}{\theta^2}}  = \frac{1}{\theta^2}
+	\end{align*}
+	as we can see, the assumptions of CR are not fulfilled on SEVERAL accounts. Also: 
+	\begin{align*}
+		\EX{\frac{\partial}{\partial \theta} \log f(x; \theta)} = - \frac{1}{\theta} \neq 0 
+	\end{align*}
+	we have 
+	\begin{align*}
+		& \frac{\partial}{\partial \theta} \idx{0}{\theta} t(x) \underbrace{f(x; \theta)}_{1/ \theta} dx \\
+		& = \frac{t(\theta)}{\theta} + \idx{0}{\theta} t(x) \frac{\partial}{\partial \theta} \left( \frac{1}{\theta} \right) dx \neq \idx{0}{\theta} t(x) \frac{\partial}{\partial \theta} \left( \frac{1}{\theta} \right) dx 
+	\end{align*}
+	unless $t(\theta) = 0$ $\forall$ $\theta$. 
+\end{ex}
+
+So, we need to temporarily suspend our UMVUE search and do more theory.
+
+\emph{Cutoff for Midterm Material} 
+\section{Sufficiency and Completeness} 
+Let $X_1, ..., X_n$ be taken from $F_\theta$, $\theta \in \Theta \subseteq \R^k$. \textbf{\underline{Q}:} How can we summarise the sample without losing information about $\theta$? This question is closely related to UMVUEs, since statistics are summaries of data. They will be optimal if we do not lose a lot of information about data when making statistics. For example, imagine the Bernoulli experiment:
+\begin{align*}
+	\{ \text{ Bernoulli Distributions }, \text{ Bernoulli}(p),\ p \in [0,1] \} 
+\end{align*}
+If $X_1, ..., X_n$ is a random sample from Bernoulli$(p)$, then let $\mathbb{X}$ denote the tuple $(X_1, ..., X_n)$. Then, the sample space consists of sequences of length $n$ consisting of 0's and 1s. It is denoted by: 
+\begin{align*}
+	\mathcal{X} = \{ 0, 1 \}^n 
+\end{align*}
+To make things more concrete, we can recall the U.S. election example. We can think about it as follows: 
+\begin{align*}
+	\pr{ \mathbb{X} = (x_1, ..., x_n) } = p^{\sum_{i=1}^n x_i} (1-p)^{1- \sum_{i=1}^n x_i} 
+\end{align*}
+Here we have a function of p (the likelihood, $L(p)$), and it only depends on the $x_i$'s through their sum. In other words, the probability depends on $(x_1, ..., x_n)$ only through the sum of the $x_i$'s (or equivalently, through their mean). \emph{Perhaps the sum} $\sum_{i=1}^n x_i$ \emph{contains all the relevant information?} To check this guess, we will calculate the conditional distribution: 
+\begin{align*}
+	\pr{X_1 = x_1, ..., X_n = x_n\ |\ \sum_{i=1}^n x_i = t} & = \begin{cases}
+			0 & \text{ if } \sum_{i=1}^n x_i \neq t \\
+			1 & \text{ if } \sum_{i=1}^n x_i = t 
+		\end{cases} \\
+		& = \frac{\pr{X_1 = x_1, ..., X_n = x_n,\ \sum_{i=1}^n x_i = t}}{\pr{\sum_{i=1}^n x_i = t}} \\
+		& = \frac{p^{\sum_{i=1}^n x_i} (1-p)^{\sum_{i=1}^n x_i}}{\binom{n}{\sum_{i=1}^n x_i} p^{\sum_{i=1}^n} (1-p)^{n-\sum_{i=1}^n x_i}} \\
+		& = \frac{1}{\binom{n}{\sum_{i=1}^n x_i}}
+\end{align*}
+Which does not depend on $p$! Now consider a statistic $\stat$. Denote by $\mathcal{X}$ the sample space of the $(X_1, ..., X_n)$ and by $\mathcal{T}$ the range of the statistic $\stat$: 
+\begin{align*}
+	\mathcal{T} := \{\ t \in \R^k\ |\ \exists\ (x_1, ..., x_n) \in \mathcal{X} \text{ so that } T(x_1, ..., x_n) = t \}  
+\end{align*}
+We want to look at a statistic as something that partitions the sample space $\mathcal{X}$. $\forall$ $t \in \mathcal{T}$, define: 
+\begin{align*}
+	A_t := \{ (x_1, ..., x_n) \in \mathcal{X}\ |\ T(x_1, ..., x_n) = t \} 
+\end{align*}
+Concretely, for the Bernoulli experiment, we have that $\mathcal{T} = \{ 0, ..., n \}$ and the partitions are: 
+\begin{align*}
+	A_t := \left\{ (x_1, ..., x_n) \in \{ 0,1 \}^n\ |\ \sum_{i=1}^n x_i = t \right\} 
+\end{align*}
+Now, $\{ A_t\ |\ t \in \mathcal{T} \}$ is a partition of $\mathcal{X}$. The $A_t$'s are disjoint and $\mathcal{X} = \bigcup_{t \in \mathcal{T}} A_t$. 
+
+Insert graphic here
+
+\begin{definition}[Sufficient]
+	Let $X_1, ..., X_n$ be a random sample from $F_\theta$, $\theta \in \Theta$. A statistic $T= \stat$ is called \dfn{sufficient} for $\theta$ if the conditional distribution of $(X_1, ..., X_n)$ given $T$ doesn't depend on $\theta$, and this holds for all $ t \in N$ so that $\mathbb{P}_\theta [ t \in N ] =1$ $\forall$ $\theta \in \Theta$. 
+\end{definition}
+
+\textbf{Remark:} Sufficiency means that the distribution of the random vector, given $(x_1, ..., x_n) \in A_t$, does not depend on $\theta$.
+
+\begin{ex}[Bernoulli]
+	Let $X_1, ..., X_n \sim$ bernoulli$(p)$. Then we have that $\sum_{i=1}^n x_i$ is sufficient for $p$. So is $\overline{x}$. 
+\end{ex}
+
+In general, a random vector is a statistic. Thus, $(X_1, ..., X_N)$ is always sufficient for $\theta$. We also have that the order statistics ($X_{(1)}, ..., X_{(n)}$) is sufficient for $\theta$ (this will be proven in Assignment 3). 
+
+\subsection{Proving the Sufficiency of Statistics}
+\textbf{Motivation}: Suppose a statistic $T$ is sufficient for $\theta$. Assume that there are two experimenters. Experimenter \# 1 has access to the full sample $(x_1, ..., x_n)$. Experimenter \# 2 only has access to the statistic $T(x_1, ..., x_n)$. Because $(X_1, ..., X_n)\ |\ T = t$ does not depend on $\theta$, let's call it $P_t^*$. So, Experimenter \# 2 can draw a sample $(y_1, ..., y_n)$ from $P^*_{t = T(x_1, ..., x_n)}$. So, $(y_1, ..., y_n)$ is a realisation of $(X_1, ..., X_n)$. We can show that Experimenter \# 2 has lost \emph{no} information: 
+\begin{align*}
+	\pr{Y_1 = y_1, ..., Y_n = y_n } & = \sum_{t \in \mathcal{T}} \pr{Y_1 = y_1, ..., Y_n = y_n, T(y_1, ..., y_n) = t} \\
+	& = \pr{Y_1 = y_1, ..., Y_n = y_n, T(Y_1, ..., Y_n) = T(y_1, ..., y_n)} \\
+	& = \underbrace{\pr{Y_1 = y_1, ..., Y_n = y_n\ |\ T = T(y_1, ..., y_n) }}_{P^*_{T(y_1, ..., y_n)}} \cdot \pr{T = T(y_1, ..., y_n)} \\
+	& = \pr{X_1 = y_1, ..., X_n = y_n\ |\ T = T(y_1, ..., y_n) } \cdot \pr{T = T(y_1, ..., y_n)} \\
+	& = \pr{X_1 = y_1, ..., X_n = y_n } 
+\end{align*}
+ Which shows that Experimenter \# 2 has lost \underline{no} information. Thus, \emph{sufficiency is a useful concept when wanting to reduce data to statistics}. However, in general it is very hard to prove that a statistic is sufficient :(. So, we want a criteria to prove that a statistic is sufficient. This motivates the following ``very handy'' theorem. 
+ 
+ \begin{theorem}[Neymen-Fisher Criterion] 
+ 	Let $f(x_1, ..., x_n; \theta)$ denote the joint PMF/PDF of $(x_1, ... x_n)$, a random sample from $F_\theta$, $\theta \in \Theta$. A statistic $T=T(x_1, ..., x_n)$ is sufficient for $\theta$ if and only if $\forall$ $\theta \in \Theta$, there exist measurable functions $g_\theta$ and $h$ so that $h$ does \emph{NOT} depend on $\theta$ for all $(x_1, ..., x_n) \in \mathcal{X}$. That is, it can be decomposed in the form: 
+ 	\begin{align}
+ 		f(x_1, ..., x_n; \theta) = h(x_1, ..., x_n) g_\theta (T(x_1, ..., x_n)) 	
+ 	\end{align}
+ \end{theorem} 
+ 
+ \begin{proof}
+ 	We will only do the proof in the discrete case. ``$\Rightarrow$'': first assume that $T$ is sufficient. Set 
+ 	\begin{align*}
+ 		& g_\theta(t) := \prth{T(X_1, ..., X_n) = t},\ t \in \mathcal{T} \\
+ 		& h(x_1, ..., x_n) := \begin{cases}
+ 			\pr{X_1 = x_1, ..., X_n = x_n\ |\ T = T(x_1, ..., x_n) } & \text{ if } \pr{T = T(x_1, ..., x_n)} > 0 \\
+ 			0 & \text{ otherwise.} 
+ 		\end{cases} 
+ 	\end{align*}
+ 	Now apply the law of Total Probability and the definition of conditional probability: 
+ 	\begin{align*}
+ 		\pr{X_1 = x_1, ..., X_n = x_n} & = \pr{X_1 = x_1, ..., X_n = x_n,\ T = T(x_1, ..., x_n) } \\ 
+ 			& = h(x_1, ..., x_n) \cdot g_\theta(T(x_1, ..., x_n)) 
+ 	\end{align*}
+ 	where $h$ is $\pr{x\ |\ T = T(x_1,...x_n)}$ and $g_\theta$ is $\pr{T=T(x_1, ..., x_n)}$. 
+ 	\newline
+ 	\newline
+ 	``$\Leftarrow$'': Now assume that the PMF factors. Then: 
+ 	\begin{align*}
+ 		\pr{X_1 = x_1, ..., X_n = x_n\ |\ T=t} & = \frac{\pr{X_1 =x_1, ..., X_n = x_n, T=t}}{\pr{T=t}} \\
+ 		& = \begin{cases}
+ 			0 & \text{ if } t \neq T(x_1, ..., x_n ) \\
+ 			\frac{\pr{X_1 = x_1, ..., X_n = x_n, T = T(x_1, ..., x_n)}}{\pr{T=T(x_1, ..., x_n)}} & \text{ otherwise } 
+ 		\end{cases} \\
+ 		 & = \frac{\pr{X_1 = x_1, ..., X_n = x_n}}{\pr{(x_1, ..., x_n) \in A_{T(x_1, ..., x_n)}}} \\
+ 		 & = \frac{\pr{X_1 = x, ..., X_n = x_n}}{\pr{(X_1, ..., X_n) \in A_{T(x_1, ..., x_n)}}} \\
+ 		 & = \frac{h(x_1, ..., x_n) g_\theta(T(x_1, ..., x_n))}{\sum_{(y_1, ..., y_n) \in A_{T(x_1, ..., x_n)}} h(y_1, ..., y_n) g_\theta (T(y_1, ...y_n))} \\
+ 		 & = T(x_1, ..., x_n) \\
+ 		 & = \frac{h(x_1, ..., x_n)}{\sum_{(y_1, ..., y_n) \in A_{T(x_1, ..., x_n)}} h(y_1, ..., y_n)}
+ 	\end{align*}
+ 	which doesn't depend on $\theta$. This thus proves sufficiency. 
+ \end{proof}
+ 
+ \begin{ex} 
+ 	Let $X_1, ..., X_n$ be a random sample from $\mathcal{U} ]0, \theta[$, where $\theta > 0$. Then, the PMF is of the form: 
+ 	\begin{align*}
+ 		f(x; \theta) = \begin{cases}
+ 			\frac{1}{\theta} & x \in ]0, \theta [ \\
+ 			0 & \text{ else}
+ 		\end{cases}
+ 	\end{align*}
+ 	To write the joint PMF of the whole random sample, we need to account for the dependence of the interval on $\theta$ (we need to write it out in terms of characteristic functions): 
+ 	\begin{align*}
+ 		f(x_1, ..., x_n; \theta) & = \prod_{i=1}^n \frac{1}{\theta} \chi_{x_i \in ]0, \theta[}  \\
+ 			& = \chi_{\min x_i > 0 } \chi_{\max x_i < \theta} \left( \frac{1}{\theta} \right)^n 
+ 	\end{align*}
+ 	Observe that we can set the first term to be $h(x_1, ..., x_n)$, since there is no dependence on $\theta$, and that w can set the second term to be $g_\theta (\max_{1 \leq i \leq n} x_i)$. Since this is the likelihood function, we can conclude that the maximum order statistic, $X_{(n)}$, is sufficient for $\theta$. 	
+ \end{ex}
+
+ \begin{ex}
+ Let $X_1, ..., X_n$ be a random sample from $\mathcal{N}(\mu, \sigma^2)$.  Then, the joint PDF is given by: 
+ \begin{align*}
+ 		f(x_1, ..., x_n; \mu, \sigma^2) = \left( \frac{1}{\sqrt{2 \pi}} \right)^2 \left( \frac{1}{\sigma} \right)^n \text{exp} \left\{ \left( \frac{-\sum_{i=1}^n (x_i - \mu)^2}{2 \sigma^2} \right) \right\}
+ \end{align*}	
+ From the proof of Theorem 1.7, we know that: 
+ \begin{align*}
+ 	\sum_{i=1}^n (x_i - \mu)^2 = (n-1)s^2 + n(\overline{x} - \mu)^2
+ \end{align*}
+ and so we can re-write the above as: 
+ \begin{align*}
+  		f(x_1, ..., x_n; \mu, \sigma^2) = \left( \frac{1}{\sqrt{2 \pi}} \right)^2 \left( \frac{1}{\sigma} \right)^n \text{exp} \left\{ \left( \frac{-(n-1)}{2 \sigma^2} s^2 - \frac{n(\overline{x}-\mu)^2}{2 \sigma^2} \right) \right\}	
+ \end{align*}
+ Here, we may choose: 
+ \begin{align*}
+ 		& h := \left( 	\frac{1}{\sqrt{2 \pi}}	\right)^n  \\
+ 		& g_\theta (\overline{x}, s^2) = \left(  \frac{1}{\sigma}		\right)^n \text{exp} \left\{ \left( \frac{-(n-1)}{2 \sigma^2} s^2 - \frac{n(\overline{x}-\mu)^2}{2 \sigma^2} \right) \right\}	
+ \end{align*}
+ So, $(\overline{x}, s^2)$ is sufficient for $(\mu, \sigma^2)$. Now suppose that $\sigma^2$ is \underline{known}. Then we can set: 
+	\begin{enumerate}[noitemsep]
+		\item $h$, $g$ as before, and obtain that $(\overline{x}, s^2)$ is sufficient for $\mu$. 
+		\item Or we set: 
+		\begin{align*}
+			& h(x_1, ..., x_n) = \left( \frac{1}{\sqrt{2 \pi}} \right)^n \left( \frac{1}{\sigma} \right)^n \text{ exp} \left\{ \frac{-(n-1)s^2}{2 \sigma^2} \right\} 
+		\end{align*}
+		which has no dependence on $\mu$, and so
+		\begin{align*}
+			g_\mu( \overline{x}) = \text{ exp} \left( 	\frac{-n(\overline{x} - \mu)^2}{2 \sigma^2}	\right) 
+		\end{align*}
+		and so $\overline{x}$ is sufficient for $\mu$. 
+	\end{enumerate}
+ \end{ex}
+ 
+Note: there are some statistics that lead to greater data reduction than others, and this leads into an idea called ``minimal sufficiency.'' Also note that: 
+\begin{enumerate}[noitemsep] 
+	\item In (1), if we use $(\overline{x}, s^2)$ and set $\mathcal{X} = \R^n$, then: 
+	\begin{align*}
+		A_{(a,b)} = \{\ (x_1, ..., x_n) \in \R^n\ |\ \overline{x} = a,\ s^2 = b \} 
+	\end{align*}
+	In this case, $a \in \R$ and $b > 0$. 
+	\item In (2), if we only use $\overline{x}$, then $\mathcal{T} = \R$ and: 
+	\begin{align*}
+		A_a = \{\ (x_1, ..., x_n) \in \R^n\ | \overline{x} = a \} 
+	\end{align*}
+	If you compare these, observe that $A_{(a,b)} \subseteq A_a$. In a way, $A_a$ is a projection, and forms a \emph{coarser} partition than $(\overline{x}, s^2)$ does. 
+\end{enumerate}
+
+\subsection{Sufficient Statistics}
+To summarise what we have so far, we have that $\stat$ is a statistic taking values in $\mathcal{T}$. Then, $\{ A_t,\ t \in \mathcal{T} \}$ is a partition of the sample space $\mathcal{X}$, where
+\begin{align*}
+	A_t = \{\ (x_1, ..., x_n) \in \mathcal{X}\ |\ T(x_1, ..., x_n) = t \}
+\end{align*}
+ This means that the statistics induce a partition on $\mathcal{X}$. 
+ 
+ Insert graphic here. 
+ 
+ \begin{definition}[Sufficient Statistic]
+ 	A sufficient statistic $T$ is called \dfn{minimally sufficient} if for any other sufficient statistic $T^*$, we have the following: 
+ 	\begin{align*}
+ 		& \forall\ (x_1, ..., x_n),\ (y_1, ..., y_n) \in \mathcal{X} \\
+ 		& T^*(x_1, ..., x_n) = T^*(y_1, ..., y_n)\ \Rightarrow T(x_1, ..., x_n) = T(y_1, ..., y_n)
+ 	\end{align*}
+ \end{definition}
+ Note that if $T$ is minimally sufficient, and if $T^*$ is sufficient, then $\{ A_t\ |\ t \in \mathcal{T} \}$ (the partition of $\mathcal{X}$ corresponding to $T$) is coarser than the partition $\{ A_{t^*}^*,\ t^* \in \mathcal{T}^* \}$ corresponding to $T^*$. Mathematically: 
+ \begin{align*}
+ 	\forall t^* \in \mathcal{T},\ \exists\ t \in \mathcal{T} \text{ s.t. } A_{t^*}^* \subseteq A_t 
+ \end{align*}
+ Here,  $A_{t^*}^* = \{ (x_1, ..., x_n ) \in \mathcal{X}\ |\ T^*(x_1, ..., x_n) = t^* \}$. 
+ 
+ The next theorem applies to statistical models where $F_\theta$ has a density: 
+ \begin{theorem}[Lehmann-Schafte Criteriea] 
+ 	Suppose that $(X_1, ..., X_n)$ has a PDF/PMF $f(x_1, ..., x_n; \theta)$, $\theta \in \Theta$. Suppose that $T$ is a statistic such that for any $(x_1, ..., x_n)$ and $(y_1, ... , y_n) \in \mathcal{X}$ such that the ratio: 
+ 	\begin{align*}
+ 		\frac{f(x_1, ..., x_n; \theta)}{f(y_1, ..., y_n; \theta)}
+ 	\end{align*}
+ 	is constant as a function of $\theta$ $\iff$ $T(x_1, ..., x_n) = T(y_1, ..., y_n)$. This property gives us that $T$ is minimally sufficient. 
+ \end{theorem}
+ 
+ \begin{ex}
+ 	Let $X_1, ..., X_n$ be a random sample from $\mathcal{N}(\mu, \sigma^2)$, where $\mu \in \R$ and $\sigma^2 > 0$. From last class, the density can be broken down as: 
+ 	\begin{align*}
+ 		f(x_1, ..., x_n; \mu, \sigma^2) & = \left( \frac{1}{\sqrt{2 \pi}} \right)^n \left( \frac{1}{ \sigma} \right)^n \text{ exp} \left\{ \frac{- \sum_{i=1}^n (x_i - \mu)^2}{2 \sigma^2} \right\}  \\
+ 		& = \left( \frac{1}{\sqrt{ 2 \pi}} \right)^n \left(  \frac{1}{\sigma^2} \right)^n \text{ exp} \left\{ \frac{-(n-1)s^2}{2 \sigma^2} - \frac{n(\overline{x} - \mu)^2}{2 \sigma^2} \right\} 
+ 	\end{align*}	
+ 	\textbf{\underline{Q}}: is it minimally sufficient? By the previous theorem: 
+ 	\begin{align*}
+ 		\frac{f(x_1, ..., x_n; \mu, \sigma^2)}{f(y_1, ..., y_n; \mu, \sigma^2)} = \text{ exp} \left\{  - \frac{(n-1)}{2 \sigma^2} (s_x^2 - s_y^2) - \frac{n}{2 \sigma^2} \left[  (\overline{x} - \mu^2 ) - (\overline{y} - \mu^2)	\right]			\right\}
+ 	\end{align*}
+ 	where
+ 	\begin{align*}
+ 		& s_x^2 = \frac{1}{(n-1)} \sum_{i=1}^n (x_i - \overline{x})^2 \\
+ 		& s_y^2 = \frac{1}{(n-1)} \sum_{i=1}^n (y_i - \overline{y})^2
+ 	\end{align*}
+ 	This ratio does not depend on $\mu$ and $\sigma^2$ if and only if $\overline{x} = \overline{y}$ and $s_x^2 = s_y^2$, which implies that $(\overline{x}, s^2)$ is minimally sufficient for $(\mu, \sigma^2)$. 
+ \end{ex}
+ 
+ \begin{proof}
+ 	Proof of the Theorem. We need to prove that $T$ is sufficient and minimally sufficient. 
+ 	\begin{enumerate}[noitemsep]
+ 		\item ($T$ is sufficient for $\theta$): We will show this using the Neymann-Fischer criteria. 
+ 		As before, consider $\{ A_t,\ t \in \mathcal{T} \}$. For any $A_t$, choose a point $x_t \in A_t$. Now, fix an arbitrary $(x_1, ..., x_n) \in \mathcal{X}$. Then we have that $(x_1, ..., x_n) \in A_{T(x_1, ..., x_n)}$. Let $x_{T(x_1, ..., x_n)}$ be a fixed point in $A_{T(x_1,..., x_n)}$. This is the representative. We thus have that $(x_1 ..., x_n) \in A_{T(x_1,...,x_n)}$. So, we have that 
+ 		\begin{align*}
+ 			\frac{f(x_1, ..., x_n; \theta)}{f(x_{T(x_1, ..., x_n)}; \theta)}
+ 		\end{align*}
+ 		does not depend on $\theta$ by assumption. Now set: 
+ 		\begin{align*}
+ 				& \frac{ f(x_1, ..., x_n; \theta)}{f(x_{T(x_1, ..., x_n)}; \theta)} = h(x_1, ..., x_n) \\
+ 				& f(x_{T(x_1, ..., x_n)}; \theta) = g_\theta (T(x_1, ..., x_n)) 
+ 		\end{align*}
+ 		So, we have thus written
+ 		\begin{align*}
+ 			f(x_1, ..., x_n; \theta) = h(x_1, ..., x_n) g_\theta (T(x_1, ..., x_n)) 
+ 		\end{align*}
+ 		and so by the Neymann Fischer Criteria, $T$ is sufficient. 
+ 		\item ($T$ is minimally sufficient). 
+ 		Let $T^*$ be another sufficient statistic. Then, from the Neymann Fischer criteria, we know that $\exists$ $h^*, g_\theta^*$ for which $\forall$ $(x_1, ..., x_n) \in \mathcal{X}$: 
+ 		\begin{align*}
+ 			f(x_1, ..., x_n; \theta) = h^*(x_1, ..., x_n) \cdot g_\theta^* (T^*(x_1, ..., x_n)) 
+ 		\end{align*}
+ 		Now pick an arbitrary $(x_1, ..., x_n)$, $(y_1, ..., y_n) \in \mathcal{X}$ so that $T^*(x_1, ..., x_n) = T^*(y_1, ..., y_n)$. We need to prove that then also $T(x_1, ..., x_n) = T(y_1, ... y_n)$. But: 
+ 		\begin{align*}
+ 			\frac{f(x_1, ..., x_n; \theta)}{f(y_1, ..., y_n; \theta)} & = \frac{h^*(x_1, ..., x_n) \cdot g_\theta^* (T^*(x_1, ...,x_n))}{h^*(y_1, ..., y_n) \cdot g_\theta^* (y_1, ..., y_n)}
+ 		\end{align*}
+ 		But we assumed that the $g^*$ are the same and so those drop out and we obtain: 
+ 		\begin{align*}
+ 			& = \frac{h^*(x_1, ..., x_n)}{h^*(y_1, ..., y_n)}
+ 		\end{align*}
+ 		which does not depend on $\theta$. This implies that $T(x_1, ..., x_n) = T(y_1, ..., y_n)$. 
+ 	\end{enumerate}
+ \end{proof}
+ 
+ \begin{ex}
+ 	Let $X_1, ..., X_n$ be a random sample taken from $\mathcal{U} ] \theta, \theta + 1 [$ where $\theta \in \R$. Then, the probability density of the sample is: 
+ 	\begin{align*}
+ 		f(x_1, ..., x_n; \theta) & = \begin{cases}
+ 			1 & \text{ if } x_i \in ] \theta, \theta + 1 [\ \forall i \in \{ 1, ..., n \} \\
+ 			0 & \text{ otherwise } 
+ 		\end{cases} \\
+ 		& = \chi_{ \min_{1 \leq i \leq n} x_i > \theta} \chi_{\max_{1 \leq i \leq n } x_i < \theta + 1 }
+ 	\end{align*}
+ 	for $(x_1, ..., x_n)$ and $(y_1, ..., y_n)$. Thus, 
+ 	\begin{align*}
+ 		\frac{f(x_1, ..., x_n; \theta)}{f(y_1, ..., y_n; \theta)}
+ 	\end{align*}
+ 	does not depend on $\theta$ if $\min_{1 \leq i \leq n} x_i = \min_{1 \leq i \leq n} y_i$ and $\max_{1 \leq i \leq n} x_i = \max_{1 \leq i \leq n} y_i$. So, $(\min_{ 1 \leq i \leq n} (x_i)$, $\max_{1 \leq i \leq n} (x_i))$ is minimally sufficient for $\theta$. 
+ \end{ex}
+ 
+ \subsection{Applications of Sufficiency in Point Estimation}
+ Let $X_1, ..., X_n$ be a random sample from $F_\theta$, $\theta \in \Theta$. Our goal is to find the uniformly minimum variance unbiased estimator of $\gamma(\theta)$ (the UMVUE). We will nwo denote our estimators by $W$. We want to find $W$ so that
+ \begin{align*}
+ 	\EXth{W} = \gamma(\theta) \text{ 		} \forall \theta \in \Theta 
+ \end{align*}
+and for any other unbiased estimator $W^*$ of $\gamma(\theta)$, we have: 
+\begin{align*}
+	\text{Var}_\theta[W] \leq \text{Var}_\theta [W^*]\ \forall \theta \in \Theta 
+\end{align*}
+First recall three important facts from Math 356. For any two random variables $Y$, $Z$: 
+\begin{enumerate}
+	\item $\EX{Y} = \EX{\EX{Y|Z}}$ (Iterative expectation) 
+	\item $\EX{Y|Z} = h(Z)$ for some measurable function $h$. That is, this is a function of $Z$. 
+	\item Var$[Y] =$ Var$[\EX{Y|Z}] + \EX{\text{Var}[Y|Z]} \geq 0$. 
+\end{enumerate}
+
+\begin{theorem}[Rao-Blackwell]
+	Let $W$ be an unbiased estimator of $\gamma(\theta)$ with finite variance and let $T$ be a sufficient statistic for $\theta$. Then, if $W^* := \EX{W|T}$, then: 
+	\begin{enumerate}[noitemsep]
+		\item $W^*$ is an unbiased estimator of $\gamma(\theta)$. 
+		\item Var$_\theta[W^*] \leq$ Var$_\theta[W]$ for all $ \theta \in \Theta$. 
+	\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+	\begin{enumerate}[noitemsep]
+		\item $\EXth{W^*} = \EXth{\EXth{W|T}} = \EXth{W} = \gamma(\theta)$ for all $\theta \in \Theta$. 
+		\item Var$_\theta [W] = \text{Var}_\theta [\EXth{W|T}] + \EXth{\text{Var}_\theta [W|T]} = \text{Var}_\theta [W^*] + \EXth{\text{Var}_\theta [W|T]}$. Since the $\EXth{\text{Var}_\theta [W|T]}$ term is positive, this implies that Var$_\theta [W] \geq $ Var$_\theta [W^*]$ for $\theta \in \Theta$. 
+	\end{enumerate}
+	We need to use the sufficiency -- finally, since $T$ is sufficient, the distribution of $(X_1, ..., X_n)$ given $T$ does not depend on $\theta$, which means that $W^*$ does not depend on $\theta$, which gives us the fact that $W^*$ is an estimator. 
+\end{proof}
+
+\begin{ex}
+	Assume that $X_1, X_2 \sim \mathcal{N}( \theta, 1)$. Let's investigate the sample mean, $\overline{x} = (1/2)(x_1 + x_2)$. Computing the quantities: 
+	\begin{align*}
+		& \EX{\overline{x}} = \theta \\
+		& \text{Var}[\overline{x}] = 1/2 \\
+		& \EX{\overline{x} | x_1 } = \EX{\frac{1}{2} (x_1 + x_2) | x_1} = \frac{1}{2} \EX{x_1 | x_2} + \EX{x_2 | x_1}  = \frac{1}{2} (x_1 + \theta) \equiv W^*
+	\end{align*}
+	Note that this is not an estimator, since it involves the unknown parameter. So, we need to repair it. 
+	\begin{align*}
+		\EX{W^*} = \frac{1}{2} \left( \EX{X_1} + \theta \right) = \frac{1}{2} (\theta + \theta) = \theta 
+	\end{align*}
+	and 
+	\begin{align*}
+		\text{Var}[W^*] = \frac{1}{4} \text{Var}[X_1] = \frac{1}{4} < \frac{1}{2}
+	\end{align*}
+	because $X_1$ is not sufficient. 
+\end{ex}
+
+\begin{corollary}
+	Let $W$ be any estimator of $\gamma ( \theta)$, not necessarily unbiased. Then, $W^* = \EX{W|T}$ where $T$ is a sufficient estimator of $\gamma (\theta)$ so that, $\forall \theta \in \Theta$: 
+	\begin{align*}
+		\text{MSE}_\theta [W^*] \leq \text{MSE}_\theta [W]
+	\end{align*}
+\end{corollary}
+
+Note: if $W$, $Z$ are arbitrary random variables. Then: 
+\begin{align*}
+	\EX{W|Z} = h(Z)
+\end{align*}
+for some measurable function $Z$. We have: 
+\begin{align*}
+	\EX{ h(Z) | Z} = h(Z) 
+\end{align*}
+
+\textbf{Intuition from Rao Blackwell:} we should condition on a minimally sufficient statistic to achieve the greatest reduction of the variance possible. \textbf{\underline{Q}:} if we condition on a minimally sufficient statistic, will we get the UMVUE/an UMVUE? Unfortunately, no. 
+
+\begin{ex}(Nasty Way of Improving an Estimator): 
+	Suppose that $W$ is some estimator of $\gamma (\theta)$, unbiased, and has finite variance. Suppose that $U$ is a statistic, $U(X_1, ..., X_n)$ so that $\EXth{U} = 0$ for all $\theta \in \Theta$ (i.e., $U$ is an estimator of $0$, which means that it is unbiased). Now let: 
+	\begin{align*}
+		W_a^* := W + aU
+	\end{align*}
+	where $a \in \R$. We get that $\EX{W_a^*} = \gamma (\theta)$ and Var$[W_a^*] = \text{Var}_\theta [W] + a^2 \text{Var}_\theta [U] + 2 a \text{Cov}_\theta [W, U] $. We have problems when cov$_{\theta_0}[W, U] \neq 0$ for some $\theta_0$. If cov$_{\theta_0}[W, U] < 0$, then for $ a \in$ \newline $ ]0, ( (-2 \text{cov}_{\theta_0} [W,U]) / \text{var}_\theta [U] ) [ $, we have that var$_{\theta_0} [W_a^*] < $ var$_{\theta_0} [W]$. This means that $W$ is not an UMVUE since we found an improvement. We will prevent this from happening. 
+\end{ex}
+
+\begin{definition}
+	A family $\{ F_\theta\ |\ \theta \in \Theta \}$ of distributions is called \dfn{complete} if for any measurable function $g$ and $X \sim F_\theta$ such that
+	\begin{align*}
+		\EXth{g(X)} = 0\ \forall \theta \in \Theta
+	\end{align*}
+	it holds that $g(X)$ is almost surely zero, i.e.: 
+	\begin{align*}
+		\pr{g(X) = 0 } = 1\ \forall \theta \in \Theta 
+	\end{align*}
+	A statistic $T$ is called \dfn{complete} if for any measurable function $g: \mathcal{T} \rightarrow \R$, 
+	\begin{align*}
+		( \forall \theta \in \Theta,\ \EXth{g(T)} = 0 ) \Rightarrow ( \prth{g(\mathcal{T}) = 0} = 1\ \forall \theta \in \Theta )
+	\end{align*}
+\end{definition}
+
+\begin{theorem}[Lehmann Scheffe Theorem]
+	Consider a random variable $X_1, ..., X_n$ from $F_\theta$, $\theta \in \Theta$. Let $\gamma (\theta)$ be a real-valued parameter of interest and $W$ an unbiased estimator for $\gamma (\theta)$. If $T$ is a complete and sufficient statistic, then $W^* = \EX{W|T}$ is THE UMVUE of $\gamma (\theta)$. 
+\end{theorem}
+
+\begin{proof}
+	This is not a very difficult proof but it is very insightful. From the Rao-Blackwell theorem, we already know: 
+	\begin{enumerate}[noitemsep]
+		\item $W^*$ is an unbiased estimator of $\gamma ( \theta ) $
+		\item $\forall \theta \in \Theta$, Var$_\theta [W^*] \leq $ Var$_\theta [W]$ for all $\theta \in \Theta$. 
+	\end{enumerate}
+	Now let $\widetilde{W}$ be another unbiased estimator of $\gamma ( \theta)$. We need to show that for all $\theta \in \Theta$, Var$_\theta [ W^*] \leq$ Var$_\theta [\widetilde{W} ]$. To do this, first Rao-Blackwelize $\widetilde{W}$, i.e., set $\widetilde{W}^* := \EX{ \widetilde{W} | T } $. Then, $\widetilde{W}^*$ is unbiased for $\gamma (\theta)$ with: 
+	\begin{align*}
+		\forall \theta \in \Theta\ \text{Var}_\theta [ \widetilde{W}^* ] \leq \text{Var}_\theta [ \widetilde{W} ]
+	\end{align*}
+	and we will show that: 
+	\begin{align*}
+		\forall \theta \in \Theta\ \text{Var}_\theta [ \widetilde{W}^*] =  \text{Var}_\theta [ \widetilde{W} ] 
+	\end{align*}
+	This is where completeness comes in. Because $W^* = \EX{W|T}$ and $\widetilde{W}^* = \EX{\widetilde{W} | T} $, we know that: 
+	\begin{align*} 
+		W^* = h(T),\ \widetilde{W}^* = \widetilde{h}(T) 
+	\end{align*}
+	for some measurable functions $h$ and $\widetilde{h}$. Moreover, for all $\theta \in \Theta$: 
+	\begin{align*}
+		\gamma(\theta) = \EXth{h(T)} = \EXth{\widetilde{h}(T)} 
+	\end{align*}
+	and so $\forall \theta \in \Theta$: 
+	\begin{align*}
+		\EXth{h(T) - \widetilde{h}(T)} = 0 
+	\end{align*}
+	So, set $g := h - \widetilde{h}$. Then, $\forall \theta \in \Theta$, $\EXth{g(T)} = 0$. This is where completeness comes in: since $T$ is a complete statistic, $g(T) = 0$ almost surely. This gives us: 
+	\begin{align*}
+		& \mathbb{P}_\theta [ g(T) = 0] = 1\ \forall \theta \in \Theta \\
+		& \forall \theta \in \Theta, \mathbb{P}_\theta [ W^* = \widetilde{W}^*] = 1 & \text{ (*) UMVUE is unique } \\
+		& \text{Var}[W^*] = Var[\widetilde{W}^*] 
+	\end{align*}
+\end{proof}
+This is a very powerful result that we can use in different ways. 
+
+\textbf{Remarks:}
+\begin{enumerate}[noitemsep]
+	\item From the proof, we see that the UMVUE is a function of a complete and sufficient statistic and that is \underline{almost surely} unique. 
+	\item If an estimator is unbiased and a function of a complete and sufficient statistic, then it must be an UMVUE. 
+	\begin{enumerate}[noitemsep]
+		\item This means that this is how we prove that things are an UMVUE. 
+		\item ``The crowning of all our efforts.''
+	\end{enumerate}
+	\item The sufficiency is generally not so hard to prove. 
+\end{enumerate}
+
+\begin{ex} 
+	Let $X_1, ..., X_n$ be a random sample from $\mathcal{U} ]0, \theta [$ $\theta > 0$ (this is a notorious counter example for a lot of things). Set: 
+	\begin{align*}
+		W := \max \{ X_1, ..., X_n\} \frac{n+1}{n}\ (*) 
+	\end{align*}	
+	Then, $W$ is an unbiased estimator of $\theta$. The variance $\rightarrow 0$ as $\mathcal{O}(1/n^2)$ (much faster than the Crammer-Rao lower bound). Is this the UMVUE? Or can we find a better one? Lehmann-Scheffe will give us our answer. Why?
+	\begin{enumerate}[noitemsep]
+		\item We already know that $X_{(n)}$ is sufficient. 
+		\item We can now show that $X_{(n)}$ is complete.
+	\end{enumerate}
+	We need to show that 
+	\begin{align*}
+		( \forall \theta \in \Theta, \EXth{g(X_{(n)}} = 0) \Rightarrow \mathbb{P}_\theta [g(X_{(n)}) =0 ] =1\ \forall \theta \in \Theta 
+	\end{align*}
+	First step: what is the distribution of the max? 
+	\begin{align*}
+		\pr{X_{(n)} \leq t} = \prod_{i=1}^n \pr{X_i \leq t} = \left( \frac{t}{\theta} \right)^n 
+	\end{align*} 
+	where $t \in ]0, \theta[$. Thus, this tends to $0$ if $ t \leq \theta$ and $1$ if $t \geq \theta$. So, the density of $T := X_{(n)}$ is differentiable: 
+	\begin{align*}
+		f_T(t) = \frac{nt^{n-1}}{\theta^n} \chi_{t \in ]0, \theta[} 
+	\end{align*}
+	Now suppose that $g$ is such that $\forall \theta \in \Theta$: 
+	\begin{align*}
+		\EXth{g(X_{(n)}) } = 0 = \idx{0}{\theta} g(t) \frac{nt^{n-1}}{\theta^n} dt 
+	\end{align*}
+	Assume that $g$ is Riemann-Integrable: 
+	\begin{align*}
+			\frac{\partial}{\partial \theta} \EXth{g(X_{(n)})} & = 0 \\
+			& = \underbrace{\left[ 	\frac{\partial}{\partial \theta} (\theta^{-n}) 		\right]}_{= 0} \cdot \idx{0}{\theta} g(t) \frac{nt^{n-1}}{\theta^n} dt \theta^n + \theta^{-n} \frac{\partial}{\partial \theta} \idx{0}{\theta} g(t) n t^{n-1} dt  \text{ (Leibnitz Rule)} \\
+			& = 0 + \theta^{-n} \cdot g(\theta)n \theta^{n-1} 
+	\end{align*}
+	So, $\forall \theta \in \Theta$: 
+	\begin{align*}
+		0 = \frac{n g(\theta)}{\theta}
+	\end{align*}
+	Since $n > 0$, $\theta > 0$ $\iff$ $g(\theta) = 0$ $\forall \theta \in \Theta$. Thus: 
+	\begin{align*}
+		& \forall \theta \in \Theta, g(\theta) = 0 \\
+		& g(t) = 0 \forall t \geq 0
+	\end{align*}
+	which is what we wanted to show. This only works because $\Theta = ]0, \infty[$. If it were smaller, we would not be able to conclude this. So, the maximum is sufficient and it is complete. So, by Lehmann-Scheffe, it is the UMVUE. 
+\end{ex}
+
+Another easy example is to estimate $p$ by the sample mean for Bernoulli random variables. $\overline{x}$ is sufficient and complete. 
+
+
+\section{Hypothesis Testing}
+\subsection{Basic Terminology}
+We will use one example to explain all the concepts. 
+
+\begin{ex} 
+	Let $X_1, ..., X_n$ be coffee beans. Quality control example. Let: 
+	\begin{align*}
+		X_i = \begin{cases}
+			0 & \text{ if quality is good} \\
+			1 & \text{ if bean is spoiled} 
+		\end{cases}
+	\end{align*}	
+	This is a random sample from Bernoulli$(p)$. We accept the shipment if $p \leq \frac{1}{100}$. Based on $X_1, ..., X_n$ we need to come up with a decision rule that allows us to decide whether $p \leq 1/100$ or not ($p > 1/100$). This is a statistical hypothesis testing problem. 
+\end{ex}
+
+\begin{definition}[Hypothesis]
+	A \dfn{hypothesis} is a statement about the population parameter $\theta$. It does not involve the $X_i$'s. Formally: given a statistical model $\{ F_\theta\ |\ \theta \in \Theta \}$ and $\Theta_0 \subseteq \Theta$, the \dfn{null hypothesis} is denoted by: 
+	\begin{align*}
+		H_0:\ \theta \in \Theta_0 
+	\end{align*}
+	It can also just be called the \dfn{null}. In this example, $\Theta \in [0, 1/100[$. The \dfn{alternative hypothesis} is 
+	\begin{align*}
+		H_1: \theta \notin \Theta_0\ \iff \theta \in \Theta_0^c 
+	\end{align*}
+	These form a partition of the parameter space. If $| \Theta_0 | =1$ (i.e. $\Theta_0 = \{ \theta_0 \}$, then $H_0$ is called \dfn{simple}; otherwise, it is called \dfn{composite} (Similar definitions for $H_1$). We will illustrate these ideas by going back to our example: 
+\end{definition}
+
+\begin{ex}[Coffee beans cont'd] 
+	\begin{align*}
+		H_0: p < 1/100 \text{ vs. } H_1: p > 1/100 	
+	\end{align*}
+	Idea: estimate $p$ from $X_1, ..., X_n$: 
+	\begin{align*}
+		\hat{p} = \overline{x} 
+	\end{align*}
+	A decision rule might be: 
+	\begin{align*}
+		\overline{x} \leq c^*  \rightarrow \text{ choose $H_0$ } \\
+		\overline{x} > c^* \rightarrow \text{ choose $H_1$ } 
+	\end{align*}
+	Or, equivalently, for 
+	\begin{align*}
+		s_n := X_1 + ... + X_n = \text{ number of spoiled beans } 
+	\end{align*}
+	\begin{align*}
+		& s_n \leq c \rightarrow H_1 \text{ (do not reject shipment) } \\
+		& s_n > c \rightarrow H_0 \text{ (reject shipment) } 
+	\end{align*}
+	The uncertainty about $\hat{p}$ comes into play when determining $c^*$. 
+\end{ex}
+
+\begin{definition}[Hypothesis Test]
+	A \dfn{hypothesis test} is a decision rule that specifies for which sample values $H_0$ is accepted and for which sample values $H_1$ is accepted. Formally, a \dfn{hypothesis test} is a Borel-measurable function: 
+	\begin{align*}
+		& \psi: \chi \rightarrow [0,1] \\
+		& (x_1, ..., x_n) \mapsto \psi(x_1, ..., x_n) \in [0,1] 
+	\end{align*}
+	The \dfn{decision rule} is the $\psi$ (i.e., $\psi(x_1, ..., x_n) $ is a statistic which means that it must not depend on unknown parameters). 
+	\begin{enumerate}[noitemsep]
+		\item $\psi(x_1, ..., x_n)$ is the probability of accepting the alternative hypothesis $H_1$. 
+		\item $\mathcal{R} := \{ (x_1, ..., x_n) \in \chi\ |\ \psi(x_1, ..., x_n) = 1 \}$ is called the \dfn{rejection region} (for $(x_1, ..., x_n) \in \mathcal{R}$, we reject $H_0$). 
+		\item $\mathcal{A} := \{ (x_1, ..., x_n) \in \chi\ |\ \psi(x_1, ..., x_n) = 0 \}$ is called the \dfn{acceptance region} (for $(x_1, ..., x_n) \in \mathcal{A}$, we accept $H_0$). 
+		\item The set $\{ (x_1, ..., x_n) \in \chi\ |\ \psi(x_1, ..., x_n) \in ]0,1[ \}$ is called the \dfn{randomisation region}. 
+	\end{enumerate}
+\end{definition}
+
+\textbf{Remark:} most of the time in this course: 
+\begin{align*}
+	\psi: \chi \rightarrow \{ 0,1 \} 
+\end{align*}
+\begin{itemize}[noitemsep]
+	\item When the randomisation region is non-empty, then $\psi$ is called a \dfn{randomised test} and is mostly of theoretical interest. 
+	\item If $\psi(x_1, ..., x_n) \in ]0,1[$, you decide by drawing $z \sim $ Bernoulli($\psi (x_1, ...x_n)$) and if
+	\begin{align*}
+		z = 0 \text{ take } H_0 \\
+		x = 1 \text{ take } H_1 
+	\end{align*}
+\end{itemize}
+\textbf{\underline{Q:}} How do we choose $c$? 
+\begin{align*}
+	B(p) & = \mathbb{P}_p (\psi (X_1, ..., X_n) = 1 ) \\
+		 & = \mathbb{P}_p (\overline{x} \geq c ) \\
+		 & = \mathbb{P}_P (X_1 + ... + X_n \geq n \cdot c ) \\
+		 & = \sum_{k = nc}^n \binom{n}{k} p^k (1-p)^{(n-k)} 
+\end{align*}
+
+
+\begin{table}[H]
+\centering 
+\begin{tabular}{|l|l|l|}
+\hline
+       & $H_0$ & $H_1$   \\ \hline
+$H_0$  & correct  & type 1 error  \\ \hline
+$H_1$ & type 2 error & correct  \\ \hline
+
+\end{tabular}
+\end{table}
+
+The horizontal axis is the decision that we make and the vertical axis is the truth. By a smart choice of $c$, we can control the Type I error, but not the type I and type II error at the same time. Rejecting the $H_0$ is safe while accepting the $H_0$ is not safe. This is why, if possible, $H_0$ is the scientific hypothesis that you want to reject (null = no change). If that leads to ``acceptance of $H_0$'' instead of saying that we accept $H_0$, then we may say that the data provides no evidence to reject the $H_0$. 
+
+
+\begin{definition}[Power Function]
+	A \dfn{power function} of a test $\psi$ is 
+	\begin{align*}
+		& B_\psi: \Theta \rightarrow [0,1] \\
+		& \theta \mapsto  \underbrace{\varepsilon_\theta \psi (X_1, ..., X_n)}_{\text{expected probability of rejecting $H_0$}}
+	\end{align*}
+	Hence, 
+	\begin{align*}
+		B_\psi(\theta) = \begin{cases}
+			\text{ Probability of Type 1 error if $\theta \in \Theta_0$} \\
+			1 - \text{ Prob of Type II error if $\theta \notin \Theta_0$ }
+		\end{cases}
+	\end{align*}
+	For a given $\alpha \in [0,1]$, a test $\psi$ is called a \dfn{Level $ \alpha$ }test if 
+	\begin{align*}
+		\sup_{\theta \in \Theta_0} B_\psi (\theta) \leq \alpha 
+	\end{align*}
+	The quantity $\sup_{\theta \in \Theta_0} B_\psi(\theta)$ is called the \dfn{size} of the test $\psi$. The set of all level $\alpha$ tests for a given hypothesis testing problem is $C_\alpha := \{ \psi\ |\ \sup_{\theta \in \Theta_0 } B_\psi (\theta) \leq \alpha \}$. 
+\end{definition}
+
+\begin{ex}[Example -- continued] 
+	Here
+	\begin{align*}
+		B(p) = \sum){k=nc}^n \binom{n}{k}p^k (1-p)^{n-k} 
+	\end{align*}
+	is increasing in $p$, so the size of the test is $B(1/100)$. To determine $c$, we pick $\alpha$, say, $\alpha = 5 \% (0.05)$ and solve $B(p_0) \leq 0.05$ for $c$. This means pick the smallest $c$ so that $B(p_0) \leq 0.05$. Suppose that $n=10$, $p_0 = 1/100$. Then: 
+\begin{table}[H]
+\centering 
+\begin{tabular}{|l|l|}
+\hline
+          &  $B(p_0)$  \\ \hline
+$c=0$   &  1 \\ \hline
+$c=1/10$ &   0.0956 \\ \hline
+$c=2/10$ &  0.0043 \\ \hline 
+$c=3/10$ & 0.0012 \\ \hline 
+\end{tabular}
+\end{table}
+\end{ex}
+
+Here, we want to choose $c=2/10$ so that we have a level $\alpha$ test and minimise the type II error. Here, the size of the test is
+\begin{align*}
+	0.0043 < 0.05 
+\end{align*}
+If we want the size to be exactly $\alpha = 0.05$, then we need a randomised test: 
+\begin{align*}
+	\psi(X_1, ..., X_n) = \begin{cases}
+		1 & \text{ if } \overline{x} \geq 2/10 \\
+		\gamma & \text{ if } \overline{x} = 1/10 \\
+		0 & \text{ if } \overline{x} = 0 
+	\end{cases}
+\end{align*}
+Calculating the expected value: 
+\begin{align*}
+	\mathbb{E}_{p_0} [ \psi (X_1, ..., X_n) ] & = 1 \cdot \mathbb{P}_{p_0} [X_1 + ... + X_n \geq 2 ] + \gamma \cdot \mathbb{P}_{p_0} [X_1 + ... + X_n = 1] = \alpha 
+\end{align*}
+So, if we choose 
+\begin{align*}
+	\gamma & = \frac{\alpha - \mathbb{P}_{p_0} [X_1 + ... + X_n \geq 2]}{\mathbb{P}_{p_0} [X_1 + ... + X_n =1] } \\
+		& \approx 0.05006 
+\end{align*}
+Suppose that the true $p$ is $0.2$. Then, the probability of a Type II error is: 
+\begin{align*}
+	\mathbb{P}_{p=0.2} \left( \sum_{i=1}^{10} X_i < 2 \right) = 1- B(0.2) = 0.376 
+\end{align*}
+We can lower this probability by increasing $n$. If $n=30$: 
+\begin{align*}
+	& P_{1/100} \left( \sum_{i=1}^{30} X_i \geq 2 \right) = 0.036 \\
+	& P_{0.2} \left( \sum_{i=1}^{30} X_i < 2 \right) = 0.01 
+\end{align*}
+
+
+\subsection{Likelihood Ratio Tests}
+General strategy to construct tests: 
+\begin{enumerate}[noitemsep]
+	\item Find a test statistic $W(X_1, ..., X_n)$. Needs to have preferably a tractable sampling distribution under $H_0$. 
+	\item Construct the rejection region $\mathcal{R}$ as the set of $(x_1, ..., x_n)$ so that $W(X_1, ..., X_n)$ is unlikely to occur under $H_0$. 
+	\item The test is then: 
+	\begin{align*}
+		\psi (X_1, ..., X_n) = \chi_{(x_1, ..., x_n) \in \mathcal{R} } 
+	\end{align*}
+\end{enumerate}
+	
+\begin{definition}[Likelihood Ratio Statistic]
+	The \dfn{likelihood ratio statistic} for testing $H_0: \theta \in \Theta_0$ vs $H_1 : \theta \notin \Theta_0$ is given by $\lambda (X_1 ..., X_n)$ where for $(x_1, ..., X_n) \in \chi$: 
+	\begin{align}
+		\lambda (x_1, ..., x_n) = \frac{\sup_{\theta \in \Theta_0} L(\theta; x_1, ..., x_n)}{\sup_{\theta \in \Theta} L(\theta; x_1, ..., x_n) }	\in [0,1] 
+	\end{align}
+	A \dfn{likelihood ratio test} (LRT) has the rejection region 
+	\begin{align*}
+		\mathcal{R} = \{ (x_1, ..., x_n)\ |\ \lambda (x_1, ..., x_n) \leq c \} 
+	\end{align*}
+	Here, $c$ is typically chosen so that the LRT is a lower level $\alpha$  test  for some given $\alpha$. 
+\end{definition}
+
+\textbf{Remark:} 
+\begin{enumerate}[noitemsep]
+	\item If $\hat{\theta}$ is the MLE of $\theta$, then: 
+	\item \begin{align*}
+		\sup_{\theta \in \Theta} L(\theta; x_1, ..., x_n) = L(\hat{\theta}; x_1, ..., x_n) 
+	\end{align*}
+	\item To calculate $\sup_{\theta \in \Theta} L(\theta; x_1, ..., x_n)$, we are doing a constrained optimisation: 
+	\begin{align*}
+		\hat{\theta_0} = \arg \max_{\theta \in \Theta_0} L( \theta; x_1, ..., x_n ) 
+	\end{align*}
+	so
+	\begin{align*}
+		\lambda(x_1, ..., x_n) = \frac{L(\hat{\theta_0}; x_1, ..., x_n)}{L(\hat{\theta}; x_1, ..., x_n)}
+	\end{align*}
+\end{enumerate}
+
+
+\end{document}
+
+
+
+
+
+
+
+
