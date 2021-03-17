@@ -1,0 +1,183 @@
+/* ---------------------- GENERAL BODY STUFF (a, h1, scrollbar, tooltip) ---------------------*/
+
+/* accent colours are (CTRL-F for them to change) */
+/* light: #48c072 */
+/* dark: #1c5057 */
+
+html, body {
+    height: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body {
+    -webkit-text-size-adjust: 100%;
+    background-color: #f5f5f5;
+    font-family: 'Nunito';
+    color: #000000;
+    font-size: 13pt;
+    font-weight: 300;
+    font-feature-settings: "onum" 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: overlay;
+    overflow-x: hidden;
+}
+
+@supports (font-variant-numeric: oldstyle-nums) {
+    body {
+        font-feature-settings: normal;
+        font-variant-numeric: oldstyle-nums;
+    }
+}
+
+a {
+    color: #48c072;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a i:hover {
+    color: #48c072;
+    -webkit-transition-duration: 300ms;
+    -o-transition-duration: 300ms;
+    -moz-transition-duration: 300ms;
+    transition-duration: 300ms;
+}
+
+h2 {
+    width: fit-content;
+    max-width: 80vw;
+    font-weight: 600;
+    color: #48c072;
+    /* font-variant: small-caps; */
+    /* line-height: 110%; */
+    /* box-shadow: inset 0 -.1em 0 #f5f5f5, inset 0 -.7em 0 #1c5057; */
+    /* padding-left: .3em; */
+    padding-right: .5em;
+    /* to make the shadow larger */
+    margin: 0;
+    margin-bottom: .5em;
+    display: inline-block;
+}
+
+h3 {
+    font-weight: 400;
+    padding-left: 3px;
+    margin-bottom: 10px;
+    margin-top: 0;
+    color: #222;
+}
+
+.main {
+    width: 600px;
+    max-width: 75vw;
+    z-index: 0;
+    /* padding-right: 20vw; */
+}
+
+#content ul {
+    margin-top: 5px;
+}
+
+#content b {
+    font-weight: 400;
+}
+
+#content .lessmargin {
+    margin-bottom: 8px;
+}
+
+.collapsible-wrapper {
+    display:inline;
+}
+
+.collapsible {
+    margin-bottom: 5px;
+    width: 18%;
+    min-width: 100px;
+    display: inline-block;
+    justify-content: space-between;
+    box-shadow: inset 0 -0.1em 0 #f5f5f5, inset 0 -0.15em 0 #1c5057;
+    cursor: pointer;
+    -webkit-transition: box-shadow 300ms;
+    -o-transition: box-shadow 300ms;
+    -moz-transition: box-shadow 300ms;
+    transition: box-shadow 300ms;
+    position: relative;
+    padding-right: 5px;
+}
+
+.collapsible:hover, .active {
+    box-shadow: inset 0 -0.1em 0 #f5f5f5, inset 0 -1.5em 0 #1c5057;
+    color: #f5f5f5;
+}
+
+.collapsible:after {
+    content: '\002B';
+    color: #ccc;
+    float: right;
+    margin-left: 5px;
+}
+
+.collapsible:hover:after, .active:after {
+    color: #eee;
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    -webkit-transition: max-height 0.2s ease-out;
+    -o-transition: max-height 0.2s ease-out;
+    -moz-transition: max-height 0.2s ease-out;
+    transition: max-height 0.2s ease-out;
+}
+
+.active:after {
+    content: "\2212";
+}
+
+.sectionhead {
+    margin-top: 20px;
+    /* width: 95%; */
+}
+
+.projectlist li {
+    padding-bottom: 5px;
+}
+
+code {
+    background-color: #dfdfdf;
+    border-radius: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+    font-size: smaller;
+}
+
+#header a {
+    margin-right: .2em;
+    font-size: large;
+    color: #666;
+}
+
+.lighter {
+    color: #555;
+}
+
+/*---------------------------------- Header (title) and Footer ------------------------------*/
+
+#header {
+    padding-top: 9vh;
+}
+
+#footer {
+    margin-top: 3em;
+    padding-bottom: 4em;
+    text-align: center;
+    font-size: small;
+    color: rgb(160, 160, 160);
+}
