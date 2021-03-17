@@ -1,0 +1,1154 @@
+\documentclass[reqno,11pt]{amsart}
+\usepackage[margin=2cm]{geometry}                
+\usepackage{color}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.4}
+\usepackage[pdfauthor={Shereen Elaidi},pdftitle={Sobolev Spaces},pdfsubject={PDE},colorlinks,citecolor=darkblue,linkcolor=darkblue,urlcolor=darkblue]{hyperref}
+%\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage{subcaption}
+\usepackage{mathrsfs}
+\usepackage{xlop}
+\usepackage{MnSymbol}
+\usepackage[ruled]{algorithm2e}
+
+\makeatletter
+\newcommand{\LeftEqNo}{\let\veqno\@@leqno}
+\makeatother
+
+\theoremstyle{definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{prop}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{axiom}{Axiom}
+\setcounter{axiom}{-1}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}{Exercise}
+\newtheorem{remark}[theorem]{Remark}
+\theoremstyle{remark}
+
+\newcommand{\reals}{{\mathbb{R}}}
+\newcommand{\TT}{{\mathbb{T}}}
+\newcommand{\sphere}{{\mathbb{S}}}
+\newcommand{\hyp}{{\mathbb{H}}}
+\usepackage{cite}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\eps}{\varepsilon}
+
+\newcommand\Hol{\mathscr{O}}
+\newcommand\Con{\mathscr{C}}
+\renewcommand\Re{\mathrm{Re}}
+\renewcommand\Im{\mathrm{Im}}
+\newcommand\exd{\mathrm{d}}
+\newcommand{\myref}[2]{{\hyperref[#2]{#1\thinspace\ref*{#2}}}}
+
+
+
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{hyperref}
+%\hypersetup{
+%    colorlinks,
+%    citecolor=black,
+%    filecolor=black,
+%    linkcolor=black,
+%    urlcolor=black
+%}
+
+\title{Math 254: Analysis I (Theorems, Definitions, and Results from the Class)}
+\author{Shereen Elaidi}
+\date{8 June 2020}
+% HEADERS
+\usepackage{fancyhdr}
+ 
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{Page \thepage}
+\fancyhead[RE,LO]{Math 254: Analysis I}
+\fancyhead[CE,CO]{Fall 2018}
+\fancyfoot[LE,RO]{}
+
+\newcommand{\dfn}[1]{\underline{\textbf{#1}}}
+\newcommand{\deriv}[1]{\frac{d}{dx} \left[ #1 \right]}
+\DeclareMathOperator{\arcsec}{arcsec}
+\DeclareMathOperator{\arccot}{arccot}
+\DeclareMathOperator{\arccsc}{arccsc}
+\DeclareMathOperator{\csch}{csch}
+\DeclareMathOperator{\sech}{sech}
+\DeclareMathOperator{\arcsinh}{arcsinh}
+\DeclareMathOperator{\arccosh}{arccosh}
+\DeclareMathOperator{\arctanh}{arctanh}
+\DeclareMathOperator{\arcsech}{arcsech}
+\DeclareMathOperator{\arccsch}{arccsch}
+\DeclareMathOperator{\arccoth}{arccoth}
+
+
+
+\begin{document}
+
+
+\maketitle 
+\begin{abstract}
+	The purpose of this document is to summarise Analysis 1 (Math 254).
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+Random things we proved to get a handle on how to prove things:
+\begin{itemize}[noitemsep]
+	\item $\cap_{x \in [0, 1] } [0,x] = \{ 0 \}$.
+	\item $2^n < n!$ 
+	\item Let $X$ and $Y$ be sets. Consider the following family of sets: 
+	\begin{align*}
+		\{ V_i\ |\ i \in I, V_i \subseteq Y \}
+	\end{align*}
+	then, $f^{-1} \left( \cup_{i \in I} V_i \right) = \cup_{i \in I} f^{-1}(V_i )$.
+	\item $5^n -1$ is divisible by 4 $\forall n \geq 1$. 
+	\item \dfn{Bernoulli's Inequality}: $\forall n \in \mathbb{N}$, $x \in \R$, $x \geq -1$, one has: 
+	\begin{align}
+		(1+x)^n \geq 1 + nx	
+	\end{align}
+	\item Every non-empty subset of the natural numbers has a smallest element. 
+\end{itemize}
+
+\begin{definition}[Cartesian Product] 
+	Let $A$ and $B$ be two sets. Then, their \dfn{Cartesian Product} is defined as: 
+	\begin{align}
+		A \times B 	:= \{ (a,b)\ |\ a \in A \land b \in B \} 
+	\end{align}
+\end{definition}
+
+\begin{definition}[Function]
+	Let $D$, $E$ be sets. A \dfn{function} $f$ from $D$ to $E$ is a subset of the cartesian product $D \times E$ such that $\forall x \in D$, $\exists_1$ $t \in E$ such that $(x,y) \in f$. In symbols, we define: 
+	\begin{align}
+		f(A) := \{ f(x)\ |\ x \in A \} 	
+	\end{align}
+\end{definition}
+
+\begin{prop}[Properties of Functions]
+	Let $f: D \rightarrow E$ be a function and let $A, B \subseteq D$. Then, consider the following: 
+	\begin{itemize}[noitemsep]
+		\item $f(A \cup B) = f(A) \cup f(B)$ [well behaved with respect to unions]
+		\item $f( A \cap B) \subseteq f(A) \cap f(B)$. 
+	\end{itemize}
+\end{prop}
+
+\begin{definition}[Pre-Image]
+	Let $f: D \rightarrow E$, $A \subseteq E$. Then, the \dfn{pre-image} is defined as: 
+	\begin{align}
+		f^{-1}(A) := \{ x \in D\ | 	f(x) \in A \} 
+	\end{align}
+\end{definition}
+
+\begin{prop}
+	Let $f: D \rightarrow E$, $A, B \subseteq E$. Then: 
+	\begin{itemize}[noitemsep]
+		\item $f^{-1}(A \cup B) = f^{-1} (A) \cup f^{-1}(B) $
+		\item $f^{-1}(A \cap B) = f^{-1}(A) \cap f^{-1}(B)$
+	\end{itemize}
+\end{prop}
+
+\begin{definition}[Injective]
+	Let $f: D \rightarrow E$. $f$ is said to be \dfn{injective} if $f(x_1) \neq f(x_2)$ whenever $x_1 \neq x_2$. 
+\end{definition}
+
+\begin{definition}[Surjective]
+	Let $f: D \rightarrow E$. $f$ is said to be \dfn{surjective} if $\forall y \in E$, $\exists x \in D$ such that $f(x) = y$.
+\end{definition}
+
+
+\begin{definition}[Bijective]
+	$f: D \rightarrow E$ is called \dfn{bijective} if it is surjective and injective.
+\end{definition}
+
+\begin{definition}
+	If $f: D \rightarrow E$ is bijective, then we can define the \dfn{inverse} function $f^{-1}: E \rightarrow D$ as follows: 
+	\begin{align} 
+		f^{-1}(y) :=x	
+	\end{align}
+	where $x$ is a uniquely determined point in $D$ with $f(x)  = y$. 
+\end{definition}
+
+\subsection{Countability of Finite Sets}
+\begin{definition}[Cardinality]
+	Let $S = \{ a_1, ..., a_n \}$. Then, the \dfn{cardinality} of $S$, in symbols $|S|$, is the number of elements in a set $S$. 
+\end{definition}
+
+\begin{theorem}
+	Let $A$, $B$ be finite sets. Then, $|A| \leq |B|$ $\iff$ there exists a function $f: A \rightarrow B$ which is injective.
+\end{theorem}
+
+\begin{theorem}
+	Let $A$, $B$ be finite sets. Then, $|A| \geq |B|$ $\iff$ $\exists$ a surjective map from $A \rightarrow B$.
+\end{theorem}
+
+\begin{theorem}
+	Let $A$, $B$ be finite sets. Then, $|A| = |B| $ $\iff$ $\exists$ a bijective map $f: A \rightarrow B$.
+\end{theorem}
+
+\begin{definition}
+	Let $A$ and $B$ be sets, not necessarily finite. We then say that $A$ and $B$ have the \dfn{same cardinality}, in symbols, 
+	\begin{align}
+		|A| = |B|	
+	\end{align}
+	if $\exists$ a bijective map $f: A \rightarrow B$. 
+\end{definition}
+
+\begin{theorem}[Cantor's Theorem]
+	Let $A$ and $B$ be sets. If $|A| \leq |B|$ and if $|B| \leq |A|$, then $|A| = |B|$. 
+\end{theorem}
+
+\begin{definition}[Countability]
+	We say that a set $A$ with $|A| = | \mathbb{N} |$ is \dfn{countably infinite}. A set which is either finite or countably infinite is called \dfn{countable}.
+\end{definition}
+
+\begin{theorem}[Arithmetic-Geometric Inequality]
+	$\forall n \geq 1$ and for all $x_1, ..., x_n >0$, the following holds: 
+\begin{align}
+	\frac{x_1 + ... + x_n}{n} \geq \sqrt[n]{x_1x_2 \cdots x_n }	
+\end{align}
+\end{theorem}
+
+\begin{lemma}
+	Let $n \in \mathbb{N}$ and let $x_1, ... , x_n > 0$. If $x_1 \cdots x_n = 1$, then: 
+	\begin{align}
+		x_1 + ... + x_n \geq n	
+	\end{align}
+\end{lemma}
+
+\begin{theorem}
+	Let $S \subseteq \mathbb{N}$. Then, there are only two possibilities: 
+	\begin{enumerate}[noitemsep]
+		\item $S$ is finite. 
+		\item $S$ is countably infinite.
+	\end{enumerate}
+\end{theorem}
+
+\begin{lemma}
+	Let $a_1 < a_2 < \cdots $ be a strictly increasing sequence of natural numbers. Then, we can say something about the growth rate: 
+	\begin{align}
+		a_n \geq n 	
+	\end{align}
+	$\forall n \in \mathbb{N}$.
+\end{lemma}
+
+\begin{theorem}
+	Let $f: \mathbb{N} \rightarrow S$ be surjective. Then, $S$ is countable.
+\end{theorem}
+
+\begin{theorem}[Cantor]
+	The set $\mathbb{Q}$  of all rational numbers is countably infinite.
+\end{theorem}
+
+\begin{theorem}
+	$\R$ is uncountable (i.e, $\R$ is infinite and there does not exist a bijection from $\mathbb{N}$ to $\R$.
+\end{theorem}
+
+\begin{definition}[Absolute Value]
+	Let $x \in \R$. Then, the \dfn{absolute value} of $x$ is defined as:
+	\begin{align}
+		|x| := \begin{cases}
+			x & \text{ if } x \geq 0 \\
+			-x & \text{ if } x < 0 
+		\end{cases}	
+	\end{align}
+	Note that $|x|$ is used to measure distances.	
+\end{definition}
+
+\begin{prop}[Properties of Absolute Value]
+	\begin{enumerate}[noitemsep]
+		\item $\forall x \in \R$, $|x| \geq 0$ and $|x| = 0 \iff x =0$. 
+		\item $\forall x, y \in \R$, $|xy| = |x||y|$. Especially, $|-x| = |x|$, in this case you would simply set $y = -1$. 
+		\item $\forall x \in \R$, $-|x| \leq x \leq |x|$.
+		\item Let $a > 0$, $x \in \R$. Then, $|x| \leq a \iff -a \leq x \leq a$.
+	\end{enumerate}
+\end{prop}
+
+\begin{theorem}[Triangle Inequality]
+	Let $x, y \in \R$. Then: 
+	\begin{enumerate}[noitemsep]
+		\item $|x+y| \leq |x| + |y| $ 
+		\item $|x-y| \geq | |x| - |y| | $ 
+		\item Especially, 
+		\begin{enumerate}[noitemsep]
+			\item $|x-y| \geq |x| - |y| $ 
+			\item $|x-y| \geq |y| - |x|$
+		\end{enumerate}
+	\end{enumerate}
+\end{theorem}
+
+\begin{corollary}
+	We also have, 
+	\begin{enumerate}[noitemsep]
+		\item $|x-y| \leq |x|+ |y| $ 
+		\item $|x+y| \geq |x| - |y|$ and $|x+y| \geq |y| - |x|$.
+	\end{enumerate}
+\end{corollary}
+
+\begin{corollary}[Generalisation of the Triangle Inequality]
+	\begin{align}
+		|x_1 + x_2 + ... + x_n | \leq |x_1| + |x_2| + ... + |x_n |	
+	\end{align}
+\end{corollary}
+
+
+\begin{definition}{$\varepsilon$-neighbourhood}
+	Let $x \in \R$ and let $\varepsilon > 0$ be fixed. Then, the \dfn{$\varepsilon$-neighbourhood} of $x$, $V_\varepsilon(x)$, to be: 
+	\begin{align*}
+		V_\varepsilon(x) & := ]x- \varepsilon, x+ \varepsilon [ \\
+						 & = \{ y \in \R\ |\ |y-x| < \varepsilon \} 	
+	\end{align*}
+\end{definition}
+
+
+\begin{theorem}
+	Let $x, y \in \R$, where $x \neq y$. Then, ``$x$ and $y$ can be separated by neighbourhoods'', i.e., $\exists$ a $\varepsilon > 0$ such that $V_\varepsilon(x) \cap V_\varepsilon(y) \neq \emptyset$.
+\end{theorem}
+
+\subsection{Supremum and Infimum}
+\begin{definition}[Bounded From Above]
+	Let $S \subseteq \R$, $S \neq \emptyset$. We say that $S$ is \dfn{bounded from above} if $\exists$ a $u \in \R$ such that $\forall s \in S$ $s \leq u$.
+\end{definition}
+
+
+\begin{definition}[Bounded from Below]
+	Let $S \subseteq \R$, $S \neq \emptyset$. We say that $S$ is \dfn{bounded from below} if $\exists$ a $u \in \R$ such that $\forall s \in S$, $u \leq s$.
+\end{definition}
+
+
+\begin{definition}[Supremum/Least Upper Bound]
+	Let $S \subseteq \R$, $S \neq \emptyset$. $u \in \R$ is called a \dfn{supremum} or \dfn{least upper bound}, denoted by $\sup{S}$, if: 
+	\begin{enumerate}[noitemsep]
+		\item $u$ is an upper bound for $S$. 
+		\item If $v$ is any other upper bound for $S$, then $u \leq v$.
+	\end{enumerate}
+	If $u = \sup{S} \in S$, then we say that $u$ is the \dfn{maximum element} of $S$.
+\end{definition}
+
+\begin{definition}[Infimum/Greatest Lower Bound]
+	Let $S \subseteq \R$, $S \neq \emptyset$. $u \in \R$ is called a \dfn{infimum} or \dfn{greatest lower bound}, denoted by $\inf{S}$, if: 	
+	\begin{enumerate}[noitemsep]
+		\item $u$ is a lower bound.
+		\item If $v$ is an arbitrary lower bound of $S$, then $v \leq u$.
+	\end{enumerate}
+	If $u = \inf{S} \in S$, then we say that $u$ is the \dfn{minimum element of $S$}.
+\end{definition}
+
+\begin{center}
+	\textbf{[Begin Tutorial]}
+\end{center}
+\begin{prop}
+	If $X_1, ..., X_{n+1}$ are countable sets, then so is $X_1 \times \cdots \times X_{n+1}$.
+\end{prop}
+
+\begin{definition}[Power Set]
+	Let $X$ be a set, possibly empty. Then, the \dfn{power set of $X$}, denoted $\mathcal{P}(X)$, is defined as the set of all subsets of $X$:
+	\begin{align}
+		\mathcal{P}(X) := \{ A\ |\ A \subseteq X \}	
+	\end{align}
+\end{definition}
+
+\begin{theorem}[Cantor's Theorem]
+	Let $X$ be a set. Then, there does not exist a surjection $X \rightarrow \mathcal{P}(X)$, which means that $|X| < | \mathcal{P}(X) | $
+\end{theorem}
+
+\begin{corollary}[Russel's Paradox]
+	The set of all sets does not exist.
+\end{corollary}
+
+\begin{prop}
+	A binary sequence is a list of points
+		\begin{align*}
+			a_1, a_2, ..., a_n , ...
+		\end{align*}
+		such that each $a_i \in \{ 0, 1\}$. Let $\mathcal{B}$ be the set of all binary sequences. Then, $\mathcal{B}$ is uncountable.
+\end{prop}
+
+\begin{center}
+	\textbf{[End Tutorial]}
+\end{center}
+
+
+\begin{theorem}
+	Let $S$ be a non-empty and bounded set from above, with supremum $\sup{S} $. Define: 
+	\begin{align*}
+		a + S := \{ a + s\ |\ s \in S \}
+	\end{align*}
+	Then, $a+S$ has a supremum which is given by: 
+	\begin{align}
+		\sup{(a+S)} = a + \sup{S} 	
+	\end{align}
+\end{theorem}
+
+\begin{theorem}
+	Let $S \neq \emptyset$, $S \subseteq \R$, $S$ bounded from above with supremum $\sup{S}$. Let $k >0$ and define: 
+	\begin{align*}
+		k \cdot s := \{ ks\ |\ s \in S \} 
+	\end{align*}
+	Then, 
+	\begin{itemize}[noitemsep]
+		\item If $k > 0$, $k \cdot S$ is bounded from above and
+		\begin{align}
+			\sup{k \cdot S} = k \cdot \sup{S} 		
+		\end{align}
+		\item if $k < 0$, then $k \cdot S$ is bounded from below and 
+		\begin{align}
+			\inf{k \cdot S} = k \cdot \sup{S} 	
+		\end{align}
+	\end{itemize}
+\end{theorem}
+
+\textbf{AXIOM:} we assume $\R$ is complete. This means that every non-empty subset $S \subseteq \R$ which is bounded from above has a supremum in $\R$.
+\begin{theorem}[Archimedean Property of $\R$]
+	Let $x \in \R$, $x > 0$. Then, $\exists n \in \mathbb{N}$ such that $n \geq x$.
+\end{theorem}
+
+\begin{theorem}
+	Let $x < y$, $x, y \in \R$. Then, $\exists r \in \mathbb{Q}$ such that $x < r < y$. I.e., this means that the rational numbers are \dfn{dense} in $\R$.
+\end{theorem}
+
+\begin{theorem}
+	The irrational numbers are dense in $\R$.
+\end{theorem}
+
+\begin{definition}
+	Let $I_1, , I_2, I_3,...$ be intervals with the following property:
+	\begin{align*}
+		I_1 \supseteq I_2 \supseteq I_3 \supseteq \cdots 
+	\end{align*}
+	Then, we call the $I_1, I_2, I_3,...$ a \dfn{nested sequence} of intervals.
+\end{definition}
+
+
+\begin{theorem}[Nested Interval Property]
+	Let $I_1 \supseteq I_2 \supseteq I_3 \cdots$ be a nested sequence of non-empty, closed and bounded (we call this compact) intervals, then: 
+	\begin{align}
+		\bigcap_{n \in \mathbb{N}} I_n \neq \emptyset	
+	\end{align}
+\end{theorem}
+
+\begin{center}
+	\textbf{THE NESTED INTERVAL PROPERTY IS IN FACT EQUIVALENT TO COMPLETNEESS.}
+\end{center}
+
+\begin{corollary}
+	$\R$ is uncountable.
+\end{corollary}
+
+\begin{center}
+	\textbf{[Begin Tutorial]}
+\end{center}
+
+\textbf{COMPLETENESS PROPERTY OF $\R$}: Let $X$ be a non-empty subset of $\R$ that is bounded from above. Then, $X$ has a least upper bound, denoted by $\sup{X}$. 
+
+
+\begin{prop}
+	Let $X \subseteq \R$. 
+	\begin{enumerate}[noitemsep]
+		\item if $X$ has a supremum, then $X$ is non-empty and bounded from above. 
+		\item if $X$ has an infimum, then $X$ is non-empty and bounded from below.
+	\end{enumerate}
+\end{prop}
+
+
+\begin{prop}
+	Let $X$ be a non-empty set and let $s$ be an upper bound for $X$ in $\R$. Then, the following statements are equivalent: 
+	\begin{enumerate}[noitemsep]
+		\item $s = \sup{S}$
+		\item $\forall $ $\varepsilon > 0$, $\exists$ $x_\varepsilon \in X$ such that:
+		\begin{align}
+			s - \varepsilon < x_\varepsilon \leq s	
+		\end{align}
+	\end{enumerate}
+\end{prop}
+
+\begin{prop}
+	Let $X$ be a non-empty set and let $v$ be a lower bound for $X$ in $\R$. Then, the following statements are equivalent: 
+	\begin{enumerate}[noitemsep]
+		\item $v = \inf{S}$
+		\item $\forall $ $\varepsilon > 0$, $\exists$ $x_\varepsilon \in X$ such that:
+		\begin{align}
+			v \leq x_\varepsilon < v + \varepsilon	
+		\end{align}
+	\end{enumerate}
+\end{prop}
+A useful application of the Archimedean property: $\forall $ $\varepsilon > 0$, one has that $\exists$ an $m \in \mathbb{N}$ such that $0 < \frac{1}{m} < \varepsilon$. 
+
+\begin{theorem}[Characterisation of Intervals]
+	Let $S \subseteq \R$ contain at least two points and assume that $S$ satisfies the property:
+	\begin{align} 	
+		x, y \in S \text{ and } x < y\ \Rightarrow [x,y] \subseteq S	
+	\end{align}
+	then $S$ is an interval.
+\end{theorem}
+
+\begin{prop}[Algebraic Properties of Sup and Inf]
+	Let $A$, $B$ be non-empty subsets of $\R$ that are bounded from above. Suppose that both $x, y \in [0, \infty[$. Then: 
+	\begin{enumerate}[noitemsep]
+		\item $\sup(A \cdot B) = \sup(A) \sup(B)$, where $A \cdot B := \{ ab\ |\ a \in A, b \in B \}$.
+	\end{enumerate}
+\end{prop}
+\begin{center}
+	\textbf{[End Tutorial]}
+\end{center}
+
+\section{Point-Set Topology}
+\begin{definition}[Open]
+	A set $U \subseteq \R$ is called \dfn{open} if $\forall x \in U$, $\exists \varepsilon > 0$ such that $V_\varepsilon(x) \subseteq U$.
+\end{definition}
+\begin{definition}[Closed]
+	A set $A \subseteq \R$ is called \dfn{closed} if its complement, $\R \setminus A$, is open.
+\end{definition}
+
+\begin{theorem}
+	$\forall  x \in \R$, $\forall \eps > 0$, $V_\eps(x) $ is open.	
+\end{theorem}
+
+\begin{theorem}
+Open intervals are open ``seems self-evident, but still requires proof.'' 	
+\end{theorem}
+\begin{theorem}
+All closed intervals are closed. 	
+\end{theorem}
+\begin{theorem}
+	Let $J$ be an arbitrary index set and let $U_j$ be open, $U_j \subseteq \R$, $\forall j \in J$. Then, the union is open:
+	\begin{align}
+		U := \bigcup_{j \in J} U_j 	
+	\end{align}
+\end{theorem}
+
+\begin{remark}
+	Arbitrary intersections of open sets are, in general, not open.
+\end{remark}
+
+\begin{theorem}
+	The finite intersection of open sets are open, i.e., if $U_1, ..., U_n \subseteq \R$ are open, then: 
+	\begin{align}
+		U := \bigcap_{i=1}^n U_i = U_1 \cap U_2 \cap \cdots U_n 	
+	\end{align}
+	is open.
+\end{theorem}
+
+\begin{theorem}
+	The arbitrary intersection of closed sets are closed, i.e., if $J$ is some index set, and if $A_j$ is closed for each $j \in J$, then:
+	\begin{align}
+		A := \bigcap_{j \in J} A_j 	
+	\end{align}
+	is closed.
+\end{theorem}
+
+\begin{theorem}
+	Finite unions of closed sets are closed. 
+\end{theorem}
+\begin{theorem}
+	$\emptyset$ and $\R$ are the only subsets of $\R$ that are both open and closed. 
+\end{theorem}
+
+\begin{definition}[Boundary Point]
+	Let $U \subseteq \R$, $x \in \R$ is called a \dfn{boundary point of $U$ } if, $\forall $$\eps > 0$, $V_\eps(x) \cap U \neq \emptyset$ and $V_\eps(x) \cap ( \R \setminus U) \neq \emptyset$ 
+\end{definition}
+
+\begin{definition}
+	The set of all boundary points of a subset $U \subseteq \R$ is called the \dfn{boundary} of $U$, denoted $\partial U$.
+\end{definition}
+
+\begin{theorem}
+	Let $S \subseteq \R$ and $U \subseteq S$, $U$ open. Then, $U \cap \partial S = \emptyset$. 
+\end{theorem}
+
+\begin{theorem}
+	Let $S \subseteq \R$. Then, $\partial S = \partial ( \R \setminus S) $.
+\end{theorem}
+
+\begin{theorem}
+	Let $S \subseteq \R$. Then, $\partial S$ is closed.
+\end{theorem}
+
+\begin{theorem}
+	Let $S \subseteq \R$. Then, 
+	\begin{enumerate}[noitemsep]
+		\item $S$ is open $\iff$ $S$ contains \emph{none} of its boundary points, i.e., 
+		\begin{align}
+			S \cap \partial S = \emptyset \hspace{2cm} \text{ or } \hspace{2cm} \partial S \subseteq \R \setminus S	
+		\end{align}
+		\item $S$ is closed $\iff$ $S$ contains all of its boundary points, i.e.:
+		\begin{align}
+			\partial S \subseteq S	
+		\end{align}
+	\end{enumerate}
+\end{theorem}
+
+
+\begin{definition}[Interior] 
+	Let $S \subseteq \R$. Then, the \dfn{interior} $\mathrm{int}(S)$ is defined as: 
+	\begin{align}
+		\mathrm{int}(S) := \bigcup_{U \subseteq S, U \mathrm{ open}}U	
+	\end{align}
+	By definition, the interior is the largest open set contained in $S$. 
+\end{definition}
+
+\begin{definition}[Closure]
+	Let $S \subseteq \R$. The \dfn{closure}, denote $\overline{S} := \mathrm{cl}(S)$ is:
+	\begin{align}
+		\overline{S} := \bigcap_{A \supseteq S} A 	
+	\end{align}
+	which is closed since arbitrary intersections of closed sets are closed. By definition, the closure is the smallest closed set containing $S$. 
+\end{definition}
+
+\begin{prop}
+	\begin{enumerate}[noitemsep]
+		\item $S$ open $\iff$ $\mathrm{int}(S) = S$. 
+		\item $S$ closed $\iff$ $\overline{S} = S$. 
+		\item $S\subseteq T$ $\Rightarrow$ $\overline{S} \subseteq \overline{T}$ and $\mathrm{int}(S) \subseteq \mathrm{int}({T})$.
+	\end{enumerate}
+\end{prop}
+
+\begin{center}
+	\textbf{[Begin Tutorial]}
+\end{center}
+\begin{theorem}[Characterisation of Intervals]
+	Let $I \subseteq \R$ containing at least two points. Assume that $I$ satisfies the following property: if $x, y \in I$ with $x < y$, then $[x,y] \subseteq I$. Then, we say that $I$ is an interval.
+\end{theorem}
+
+\begin{center}
+	\textbf{[End Tutorial]}
+\end{center}
+
+\begin{prop}
+	Properties: 
+	\begin{enumerate}[noitemsep]
+		\item If $S \subseteq T$, $S$ open, then $S \subseteq \mathrm{int}(T)$.
+		\item If $S \subseteq T$, $T$ closed, then $\overline{S} \subseteq T$.
+		\item $\overline{\overline{S}} = \overline{S}$.
+		\item $\mathrm{int}(\mathrm{int}(S)) = \mathrm{int}(S)$.
+		\begin{enumerate}[noitemsep]
+			\item CAUTION! In general, $\partial (\partial S) \neq \partial S$ in general.
+		\end{enumerate}
+	\item $\mathrm{int}(S) \cup \partial S = \overline{S}$.
+	\end{enumerate}
+\end{prop}
+
+\begin{theorem}[Characterisation of Open intervals in $\R$]
+	A subset $S \subseteq \R$ is open $\iff$ $S$ is the countable union of open intervals.
+\end{theorem}
+
+
+\section{Sequences}
+
+\begin{definition}
+	An \dfn{infinite sequence} is a function $f: \N \rightarrow \R$ for which $n \mapsto f(n) = a_n$.
+\end{definition}
+
+\begin{definition}
+	Let $(a_n)$ be a sequence, $L \in \R$. We say that $(a_n)$ \dfn{converges} to $L$, or that the \dfn{limit} of $(a_n)$ is $L$, if:
+	\begin{align}
+		\forall\ \eps > 0,\ \exists\ N \in \N, \text{ s.t. } \forall\ n \geq N,\ |a_n - L| < \eps 	
+	\end{align}
+\end{definition}
+
+\begin{theorem}
+	Let $(a_n)$ be a sequence. If $(a_n)$ converges, then the limit is uniquely determined.
+\end{theorem}
+
+\subsection{Some Results on Convergent Sequences}
+\begin{theorem}
+	Every convergent sequence is bounded. 
+\end{theorem}
+
+\begin{theorem}
+	Let $(a_n)$, $(b_n)$ be convergent sequences with $a := \lim (a_n)$ and $b:= \lim (b_n)$. Then, 
+	\begin{enumerate}[noitemsep]
+		\item $(a_n + b_n) $ is convergent and $\lim(a_n + b_n) = a+b$. 
+		\item $(a_n \cdot b_n)$ is convergent and $\lim ( a_n \cdot b_n) = a \cdot b$. 
+	\end{enumerate}
+\end{theorem}
+
+\begin{corollary}
+\begin{enumerate}[noitemsep]
+	\item Let $c \in \R$, $(a_n)$ convergent with $a = \lim (a_n)$. Then, $c (a_n)$ is convergent with $\lim(c \cdot a_n) = ca$.
+	\item $(a_n)$, $(b_n)$ convergent with $a = \lim ( a_n)$, $b = \lim (b_n)$. Then, $(a_n - b_n)$ is convergent and $\lim (a_n - b_n) = a -b$.
+\end{enumerate}
+\end{corollary}
+
+
+\begin{theorem}
+	Let $(b_n)$ be convergent, $b:= \lim (b_n)$ such that $\forall n \in \N$, $b_n \neq 0$ and $b \neq 0$. Then, $(1/b_n)$ converges and its limit is $1/b$.
+\end{theorem}
+
+\begin{theorem}
+	Let $(a_n)$, $(b_n)$ be convergent sequences with $a := \lim (a_n)$, $b:= \lim (b_n)$ and $\forall n \in \N$, $b_n \neq 0$. Then, $(a_n / b_n)$ converges and $\lim (a_n / b_n) = (a/b)$.
+\end{theorem}
+
+\begin{theorem}[Convergence Criterion]
+	Let $(a_n)$ be a sequence, $(b_n)$ a convergent non-negative sequence with $\lim (b_n) = 0$, and let $c > 0$. If $\exists k \in \N$ such that $\forall n \geq k$, $|a_n - a| \leq c \dot b_n$, then $(a_n)$ converges and $\lim(a_n) = a$.
+\end{theorem}
+
+\begin{theorem}
+	Let $(x_n)$ be a sequence such that $\exists k \in \N$, $\forall n \geq k$, $x_n \geq 0$. If $(x_n)$ converges, then $x:= \lim(x_n) \geq 0$.
+\end{theorem}
+
+\begin{corollary}
+	Let $(x_n)$, $(y_n)$ be convergent sequences with $k \in \N$ such that $x_n \leq y_n$ $\forall n \geq k$. Then, $\lim(x_n) \leq \lim(y_n)$.
+\end{corollary}
+
+\begin{corollary}
+	Let $(x_n)$ be a convergent sequence such that $\exists$ $k \in \N$ such that $\forall n \geq k$, $a \leq x_n \leq b$, $a, b \in \R$. Then, $a \leq \lim (x_n) \leq b$.
+\end{corollary}
+
+\begin{theorem}[Squeeze Theorem]
+	Let $(a_n)$, $(b_n)$, $(x_n)$ be sequences with $\exists k \in \N$ such that $\forall n \geq k$, we have $a_n \leq x_n \leq b_N$. Furthermore, let $(a_n)$ and $(b_n)$ converge to the same limit $x$. Then, 
+	\begin{enumerate}[noitemsep]
+		\item $(x_n)$ converges and 
+		\item $\lim(x_n) = x$.
+	\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+	Assume that $(a_n)$ is bounded and that $(b_n)$ converges to zero. Then, $(a_n \cdot b_n)$ converges to zero.
+\end{theorem}
+
+\subsection{Monotone Sequences}
+\begin{definition}[Increasing, strictly increasing, eventually increasing]
+	Let $(x_n)$ be a sequence. Then, 
+	\begin{enumerate}[noitemsep]
+		\item $(x_n)$ is \dfn{increasing} if $x_1 \leq x_2 \leq ...$ 
+		\item $(x_n)$ is \dfn{strictly increasing} if $x_1 < x_2 < ...$
+		\item $(x_n)$ is \dfn{eventually increasing} if $\exists$ $k \in \N$ such that $x_k \leq x_{k+1} \leq x_{k+2} \leq ...$
+	\end{enumerate}
+\end{definition}
+
+\begin{definition}[Monotone]
+	A sequence $(x_n)$ is called \dfn{monotone} if it is increasing or decreasing.
+\end{definition}
+
+\begin{theorem}[Monotone Sequence Theorem]
+	Let $(x_n)$ be a monotone sequence. 
+	\begin{enumerate}[noitemsep]
+		\item $(x_n)$ converges $\iff$ it is bounded. 
+		\item If $(x_n)$ is bounded and increasing, then
+		\begin{align}
+			\lim (x_n) = \sup \{ x_n\ |\ n \in \N \} 	
+		\end{align}
+		\item if $(x_n)$ is bounded and decreasing, then
+		\begin{align}
+			\lim(x_n) = \inf \{ x_n\ |\ n \in \N \} 	
+		\end{align}
+
+	\end{enumerate}
+\end{theorem}
+
+\begin{center}
+	\textbf{[Begin Tutorial]}
+\end{center}
+\begin{prop}
+	Let $(x_n) \rightarrow x \in \R$ be a sequence. Then, $(|x_n|) \rightarrow |x|$.
+\end{prop}
+\begin{theorem}
+	Let $a>1$. Then, $\lim (1/a^n) = 0$.
+\end{theorem}
+\begin{theorem}
+	Let $a \in ]-1, 1[$. Then, $\lim(a^n) =0$.
+\end{theorem}
+
+\begin{theorem}
+	Let $(x_n)$ be with $x_n > 0$. If
+	\begin{align}
+		L = \lim \left( \frac{x_{n+1}}{x_n} \right) 	
+	\end{align}
+	exists and $L<1$, then $\lim (x_n) = 0$.
+\end{theorem}
+
+\begin{definition}[Series]
+	Let $(x_n)$ be a sequence in $\R$ or $\C$. For $N \in \N$, define:
+	\begin{align}
+		S_N := \sum_{n=1}^N x_n 	
+	\end{align}
+	Thus, $(S_n)$ is a sequence in $\R$ or $\C$. If $\lim_{N \rightarrow \infty} S_N =: S$ exists, we write $\sum_{n=1}^\infty x_n$.
+\end{definition}
+
+\begin{definition}[Converge, Series]
+	We say that $\sum_{n=1}^\infty |x_n| = \lim_{N \rightarrow \infty} \sum_{n=1}^N |x_n|$ exists $\iff$ the sequence of partial sums is bounded.
+\end{definition}
+
+\begin{example}
+	$\lim(2^n/n!) =0$.
+\end{example}
+
+\begin{example}
+	$\lim(n!/n^n) =0$.
+\end{example}
+
+\begin{center}
+	\textbf{[End Tutorial]}
+\end{center}
+
+\subsection{Subsequences}
+
+\begin{definition}
+	Let $n_1 < n_2 < n_3 < ...$ be natural numbers. Let $(x_n)$ be a sequence and consider:
+	\begin{align}
+		(x_{n_k}) = (x_{n_1}, x_{n_2}, .... )	
+	\end{align}
+	The $(x_{n_k})$ is a \dfn{subsequence} of $(x_n)$.
+\end{definition}
+
+\begin{theorem}
+	Let $(x_n) \rightarrow x$ and let $(x_{n_k})$ be a subsequence. Then, $(x_{n_k})$ converges to $x$.
+\end{theorem}
+
+\begin{corollary}
+	Let $(x_n)$ be a sequence. Then, $(x_n)$ converges $\iff$ all subsequences of $(x_n)$ converge to the \emph{same} limit.
+\end{corollary}
+
+\begin{example}
+	$\lim (1 + a/n)^n = e^a$.
+\end{example}
+
+\begin{example}
+	$\lim (\sqrt[n]{a}) =1$ for $a > 1$, $n \in \N$.
+\end{example}
+
+\begin{example}
+	$\lim (\sqrt[n]{n}) = 1$.
+\end{example}
+
+\begin{definition}[Accumulation Point]
+	Let $(x_n)$ be a sequence. A point $x \in \R$ is called an \dfn{accumulation point} of $x_n$ if $\exists$ a subsequence $(x_{n_k})$ of $x_n$ that converges to $x$.
+\end{definition}
+
+\begin{theorem}
+	Let $(x_n)$ be a sequence, $x \in \R$ an accumulation point of $(x_n)$ $\iff$ $\forall \eps > 0$, $V_\eps(x)$ contains infinitely many points of $(x_n)$.
+\end{theorem}
+
+\begin{theorem}[Bolzano-Weierstrass Theorem]
+	Let $(x_n)$ be a bounded sequence in $\R$. Then, $(x_n)$ has a convergent subsequence i.e., $(x_n)$ has at least one accumulation point.
+\end{theorem}
+
+\begin{definition}[Limit Superior]
+	Let $(x_n)$ be bounded. The greatest accumulation point of $(x_n)$ is called the \dfn{limit superior} of $(x_n)$: $x^* := \limsup (x_n)$.
+\end{definition}
+
+\begin{definition}[Limit inferior] 
+		Let $(x_n)$ be bounded. The smallest accumulation point of $(x_n)$ is called the \dfn{limit inferior} of $(x_n)$: $x_* := \liminf (x_n)$.
+\end{definition}
+
+\begin{theorem}
+	Let $(x_n)$ be bounded. Let $v_m := \sup( x_1, ..., x_m)$. Then, 
+	\begin{align*}
+		\lim (v_m) 	& = \lim ( \sup \{ x_n\ | n \geq m \} ) \\
+					& = \limsup(x_n) 
+	\end{align*} 
+	and 
+	\begin{align*}
+		\liminf(x_n) = \lim (\inf \{ x_n\ |\ n \geq m \} ) 
+	\end{align*}
+\end{theorem}
+
+
+\subsection{Cauchy Sequences}
+
+\begin{definition}[Cauchy Sequence]
+	A sequence $(x_n)$ is called a \dfn{Cauchy sequence} if $\forall \eps > 0$, $\exists N \in \N$ such that $\forall m , n \geq N$, one has 
+	\begin{align}
+		|x_n - x_m| < \eps 	
+	\end{align}
+\end{definition}
+
+\begin{theorem}
+	A sequence in $\R$ converges $\iff$ it is a Cauchy Sequence.
+\end{theorem}
+
+\begin{theorem}
+	Every Cauchy Sequence is bounded. 
+\end{theorem}
+
+\begin{definition}[Contractive Sequence]
+	A sequence $(x_n)$ is \dfn{contractive} if $\exists$ a $0 < c < 1$ such that
+	$\forall n \in \N$, 
+	\begin{align}
+		|x_{n+2} - x_{n+1} | \leq  c | x_{n+1} - x_n | 	
+	\end{align}
+\end{definition}
+
+\begin{theorem}
+	Every contractive sequence is Cauchy, and thus converges.
+\end{theorem}
+
+
+\subsection{Divergence to $\pm \infty$}
+\begin{definition}
+	Let $(x_n)$ be a sequence. 
+	\begin{enumerate}[noitemsep]
+		\item $(x_n)$ \dfn{diverges to $\infty$} if $\forall M \in \R$, $\exists N \in \N$ such that $\forall n \geq N$, $x_n > M$.
+		\item $(x_n)$ \dfn{diverges to $-\infty$} if $\forall M \in \R$, $\exists N \in \N$ such that $\forall n \geq N$, $x_n < M$.
+	\end{enumerate}
+\end{definition}
+\begin{theorem}
+	An increasing sequence diverges to $+\infty$ $\iff$ it is unbounded. Similarly, a decreasing sequence diverges to $-\infty$ $\iff$ it is unbounded.
+\end{theorem}
+
+
+\begin{center}
+	\textbf{[Begin Tutorial]}
+\end{center}
+
+\begin{theorem}
+	Let $F \subseteq \R$, $F \neq \emptyset$. Then, TFAE: 
+	\begin{enumerate}[noitemsep]
+		\item $F$ is closed. 
+		\item If $x_n$ is a sequence in $F$ and $x = \lim (x_n)$, then $x \in F$.
+	\end{enumerate}
+\end{theorem}
+
+
+\begin{prop}
+	Let $(x_n)$ be a bounded sequence. Then, $\lim(x_n)$ exists $\iff$ $(x_n)$ has only one accumulation point.
+\end{prop}
+
+\begin{prop}
+	Let $(x_n)$ be bounded, Then, $\lim(x_n)$ exists $\iff$ $\limsup(x_n) = \liminf(x_n)$.
+\end{prop}
+
+\begin{center}
+	\textbf{[End Tutorial]}
+\end{center}
+
+\section{Limits of Functions}
+
+\begin{definition}
+	Let $f: A \subseteq \R \rightarrow \R$ be a function. Let $c, L \in \R$. We say that the \dfn{limit of $f$ as $x$ approaches} \dfn{$c$ is $L$}, in symbols, $\lim_{x \rightarrow x}f(x) = L$, if $\forall$ sequences $(x_n) \in A$ with $\lim(x_n) = c$, $\lim (f(x_n)) = L$.
+\end{definition}
+
+\begin{definition}[Cluster Point]
+	Let $A \subseteq \R$. $c$ is called a \dfn{cluster point} of $A$ if either of the two equivalent definitions hold: 
+	\begin{enumerate}[noitemsep]
+		\item There exists a sequence $(x_n) \in A \setminus \{ c \}$ such that $\lim (x_n) = c$.
+		\item $\forall \eps > 0$, $V_\eps^*(c) \cap A \neq \emptyset$.
+	\end{enumerate}	
+\end{definition}
+
+\begin{theorem}
+	Let $A \subseteq \R$, $c$ a cluster point of $A$. Let $f: A \rightarrow \R$. If $\lim_{x \rightarrow c} (f(x)) $ exists, then it is uniquely determined.
+\end{theorem}
+
+\begin{definition}
+	A point $c \in A$ which is not a cluster point is called an \dfn{isolated point}, i.e., $c$ is isolated if $\exists \eps > 0$ such that $V_\eps^*(c) \cap A \neq \emptyset$.
+\end{definition}
+
+\begin{theorem}
+	Let $A \subseteq \R$, $c$ a cluster point of $A$. Then, $c \in \overline{A} = A \cup \partial A$.	
+\end{theorem}
+
+\begin{definition}[$\eps- \delta$ definition of a limit]
+	Let $f: A \rightarrow \R$, $c$ a cluster point of $A$, $L \in \R$. We say that $\lim_{x \rightarrow c} f(x) = L$ if: 
+	\begin{align}
+		\forall \eps > 0, \exists \delta > 0\ s.t.\ \forall x \in A,\ 0 < |x-c| < \delta \Rightarrow |f(x) - L| < \eps 	
+	\end{align}
+\end{definition}
+
+\begin{definition}[Topological Definition of a Limit] 
+Two equivalent definitions:
+\begin{enumerate}[noitemsep]
+	\item 	$\forall \eps > 0$, $\exists$ $\delta > 0$ such that $\forall x \in V_\delta^*(c)$, $f(x) \in V_\eps (L)$. 
+	\item $\forall \eps > 0$, $\exists \delta > 0$. such that $f(V_\delta^*(c)) \subseteq V_\eps (L)$.
+\end{enumerate}
+\end{definition}
+
+
+\begin{theorem}
+	The sequential definition and the $\eps-\delta$ definition of a limit are equivalent. 
+\end{theorem}
+
+\begin{theorem}[Sequential Criterion for the non-existence of a limit]
+	$f: A \rightarrow \R$, $c$ a cluster point of $A$. Then, 
+	\begin{enumerate}[noitemsep]
+		\item Let $(x_n)$ be a sequence in $A \setminus \{ c \}$ with $\lim (x_n) = c$. If $(f(x_n))$ diverges, then $\lim_{x \rightarrow c} f(x)$ does not exist.
+		\item Let $(x_n)$, $(y_n)$ be sequences in $A \setminus \{ c \}$ with $\lim (x_n) = c = \lim (y_n)$. If $(f(x_n))$ and $(f(y_n))$ both converge but have different limits, then $\lim_{x \rightarrow c}f(x) $ does not exist.
+	\end{enumerate}
+\end{theorem}
+
+
+\begin{theorem}[Limit Laws]
+	Let $f, g: A \subseteq \R \rightarrow \R$, $c$ a cluster point of $A$ such that $\lim_{x \rightarrow c} f(x)$ and $\lim_{x \rightarrow c} g(x)$ exists. Then: 
+	\begin{enumerate}[noitemsep]
+		\item $\lim_{x \rightarrow c} [af(x) + bg(x)] = a \lim_{ x \rightarrow c} f(x) + b \lim_{x \rightarrow c} g(x)$.
+		\item $\lim_{x \rightarrow c} [f(x)g(x)] = \lim_{x \rightarrow c} f(x) \lim_{x \rightarrow c} g(x) $
+		\item $\lim_{x \rightarrow c} \frac{f(x)}{g(x)} = \frac{\lim_{x \rightarrow c} f(x)}{\lim_{x \rightarrow c} g(x)}$
+	\end{enumerate}
+\end{theorem}
+
+\subsection{Continuity}
+\begin{definition}[Continuous] 
+	Let $f: A \rightarrow \R$, $c$ a cluster point of $A$, $c \in A$. We say that $f$ is \dfn{continuous at $c$} if: 
+	\begin{align}
+		\lim_{x \rightarrow c} f(x) = f(c)	
+	\end{align}
+\end{definition}
+
+\begin{theorem}
+	Let $f: A \rightarrow \R$, $c$ a cluster point of $A$, $a, b \in \R$ such that $a \leq f(x) \leq b$ $\forall x \in A$. If $\lim_{x \rightarrow c} f(x) $ exist, then it holds that
+	\begin{align}
+		a \leq \lim_{x \rightarrow c} f(x) \leq b 	
+	\end{align}
+\end{theorem}
+
+\begin{theorem}[Squeeze Theorem]
+	Let $f, g, h$ be functions from $A \rightarrow \R$, let $c $ be a cluster point of $A$ such that $\lim_{x \rightarrow c} g(x) = L = \lim_{x \rightarrow c} h(x)$ and $g(x) \leq f(x) \leq h(x)$ $\forall x \in A$. Then, $\lim_{x \rightarrow c} f(x)$ exists and equals $L$.	
+\end{theorem}
+
+\begin{theorem}
+	Let $f: A \rightarrow \R$, $c$ a cluster point of $A$. Then, $\lim_{x \rightarrow c}f(x)$ exists $\iff$ both one-sided limits exist and are equal. 
+\end{theorem}
+
+\begin{definition}[Sequential Definition of Continuity] 
+	$\lim_{x \rightarrow c} f(x) = f(c)$ if $\forall (x_n)$ in $A \setminus \{ c \}$ with $\lim (x_n) = c$, it follows that $\lim (f(x_n)) = f(c)$.
+\end{definition}
+
+\begin{theorem}
+	Let $f, g: A \rightarrow \R$ be continuous, $c$ a cluster point, $c \in A$, $f,g$ continuous at $c$. Then:
+	\begin{enumerate}[noitemsep]
+		\item $f+g$ is continuous at $c$. 
+		\item $f-g$ is continuous at $c$
+		\item $f \cdot g$ is continuous at $c$. 
+		\item $f/g$ is continuous at $c$, provided $g(x) \neq 0$ $\forall x \in A$.
+	\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+	Let $f: A \rightarrow \R$, $g: B \rightarrow \R$, $f(A) \subseteq B$, $f$ continuous at $c \in A$, $g$ continuous at $d:= f(c)$. Then, $g \circ f: A \rightarrow \R$ is continuous at $c$.
+\end{theorem}
+
+\begin{theorem}[Location of Roots Theorem]
+	Let $I:=[a,b]$, $f: I \rightarrow \R$ be continuous such that $f(a) > 0$ and $f(b) < 0$ or vice versa. Then, $\exists $ $c \in ]a,b[$ such that $f(c) =0$.
+\end{theorem}
+
+\begin{theorem}[Intermediate Value Theorem]
+	Let $f: I \rightarrow \R$, $f$ continuous on $I$. Let $a, b \in I$ with $f(a) < f(b)$ and let $d$ be a point in between. Then, $\exists$ a $c$ between $a$ and $b$ with $f(c) =d$.
+\end{theorem}
+
+\begin{theorem}[Preservation of Intervals] 
+	Let $f: A \rightarrow \R$ continuous, $I \subseteq A$. Then, $f(I)$ is an interval.
+\end{theorem}
+
+\begin{definition}[Open Cover]
+	Let $S \subseteq \R$, $\mathcal{C} := \{ U_i\ |\ i \in I\}$ a collection of open sets such that $S \subseteq \bigcup_{i \in I}U_i$. Then, we say that $\mathcal{C}$ is an \dfn{open cover} for $S$.
+\end{definition}
+
+\begin{theorem}[Heine-Borel]
+	A subset $S \subseteq \R$ is compact $\iff$ every open cover of $S$ has a finite sub-cover.
+\end{theorem}
+
+\begin{theorem}
+	Let $A \subseteq \R$ be compact, $f: A \rightarrow \R$ locally bounded on $A$. Then, $f$ is bounded on $A$. 
+\end{theorem}
+
+\begin{theorem}[Topological Characterisation of Continuity]
+	Let $f: A \rightarrow \R$; $f$ is continuous on $A$ $\iff$ the pre-image under $f$ of every open set is open in $A$. 
+\end{theorem}
+
+\begin{definition}[Relatively Open]
+	$W \subseteq \R$ is called \dfn{open in $A$} if there exists an open set $U \subseteq \R$ such that $W = A \cap U$.
+\end{definition}
+
+\begin{theorem}
+	Let $f: A \rightarrow \R$ be continuous and let $A$ be compact. Then, $f(A) $ is compact.
+\end{theorem}
+
+\begin{corollary}
+	Let $f: [a,b] \rightarrow \R$ be continuous. Then, $f([a,b])$ is a compact interval.
+\end{corollary}
+
+\begin{theorem}[Min-Max Theorem]
+	Let $f: A \rightarrow \R$ be continuous; $A$ compact. Then, $f$ has at least one minimum and one maximum.
+\end{theorem}
+
+\begin{definition}[Uniformly Continuous]
+	A function $f: A \rightarrow \R$ is \dfn{uniformly continuous} on $A$ if $\forall \eps > 0$, $\exists$ $\delta = \delta(\eps) > 0$ such that $\forall u, x \in A$ such that $|x-u| < \delta$ implies $|f(x) - f(u)| < \eps$.
+\end{definition}
+
+\begin{theorem}[Two-Sequence Criterion for Non-Uniform Continuity] 
+	Let $f: A \rightarrow \R$. If $\exists$ $\eps_0 > 0$ and two sequences $(x_n)$ and $(u_n)$ in $A$ such that $\lim(x_n - u_n) = 0$ but $|f(x_n) - f(u_n)| \geq \eps_0$ for all $n \in \N$, then $f$ is not uniformly continuous. 
+\end{theorem}
+
+\begin{theorem}
+	Let $f: A \rightarrow \R$ be uniformly continuous. Let $(x_n)$ be a Cauchy sequence in $A$. Then, $(f(x_n))$ is also a Cauchy sequence. 
+\end{theorem}
+
+\begin{theorem}
+	Let $f: A \rightarrow \R$, $f$ continuous, $A$ compact. Then, $f$ is uniformly continuous on $A$. 
+\end{theorem}
+
+\begin{definition}
+	$f: A \rightarrow \R$ is called a \dfn{Lipschitz Function} or is said to be \dfn{Lipschitz Continuous} or is said to satisfy a \dfn{Lipschitz Condition} if $\exists k > 0$ such that $|f(x) - f(u)| \leq k |x-u|$ for all $u, x \in A$.
+\end{definition}
+
+\begin{theorem}
+	Let $f: A \rightarrow \R$. If $f$ is \dfn{Lipschitz continuous} on $A$, then $f$ is uniformly continuous on $A$.
+\end{theorem}
+
+\section{Differentiation}
+\begin{definition}
+	Let $I \subseteq \R$ be an interval and let $f: I \rightarrow \R$. Let $c \in I$. We say that $f$ is \dfn{differentiable} at $a$ if the following limit exists:
+	\begin{align}
+		f'(c) := \lim_{x \rightarrow c} \frac{f(x) - f(c)}{x-c}	
+	\end{align}
+\end{definition}
+
+\begin{theorem}[Caratheodory]
+	Let $f: I \rightarrow \R$, $c \in I$, $f$ is differentiable at $c$ $\iff$ there exists a $\varphi: I \rightarrow \R$ which is continuous at $c$ such that $f(x) = f(c) + f(x)(x-c)$. In that case, $\varphi(c) = f'(c)$.
+\end{theorem}
+
+\begin{theorem}[Chain Rule]
+	Let $f: I \rightarrow \R$, $g: J \rightarrow \R$. $f(I) \subseteq J$, $c \in I$, $d:=f(c)$. Assume $f$ is differentiable at $c$, $g$ differentiable at $d$. Then, $g \circ f: I \rightarrow \R$ is differentiable at $c$ and:
+	\begin{align}
+		(g \circ f)'(c) = g'(f(c)) \cdot f'(c) 	
+	\end{align}
+\end{theorem}
+
+\begin{theorem}[Fermat's Theorem]
+	Let $f: I \rightarrow \R$, $c \in I$, $c \notin \partial I$, $f$ differentiable at $c$. Let $f$ have a local extremum at $c$. Then, $f'(c) =0$.
+\end{theorem}
+
+\begin{theorem}[Rolle's Theorem]
+	Let $f: [a,b] \rightarrow \R$, $f$ continuous on $[a,b]$ and differentiable on the open interval $]a,b[$. Let $f(c) = f(b) =0$. Then, $\exists$ a $c \in ]a,b[$ such that $f'(c) =0$.
+\end{theorem}
+
+\begin{theorem}[Mean Value Theorem]
+	Let $f: [a,b] \rightarrow \R$, $f$ continuous on $[a,b]$, $f$ differentiable on $]a,b[$. Then, $\exists$ a $c \in ]a,b[$ such that 
+\begin{align}
+	f'(c) = \frac{f(b) - f(a)}{b-a}	
+\end{align}
+\end{theorem}
+
+\subsection{Applications of the Mean Value Theorem}
+\begin{theorem}
+Let $f: [a,b] \rightarrow \R$ be differentiable. Then, $f' \equiv 0$ on $[a,b]$ $\iff$ $f$ is constant on $[a,b]$.
+\end{theorem}
+
+\begin{corollary}
+	Let $f, g: [a,b] \rightarrow \R$ differentiable such that $f' \equiv g'$ on $[a,b]$. Then, $\exists$ a $c \in \R$ such that $g = f+c$.
+\end{corollary}
+
+\begin{theorem}
+	Let $f: [a,b] \rightarrow \R$, $f$ differentiable. Then, $f$ is increasing on $[a,b]$ $\iff$ $f'(x) \geq 0$ $\forall x \in [a,b]$.
+\end{theorem}
+
+
+\begin{theorem}
+	Let $f: I \rightarrow \R$ be differentiable. Then, $f$ is Lipschitz continuous on $I$ $\iff$ $f'$ is bounded on $I$.
+\end{theorem}
+\end{document} 
